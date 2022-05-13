@@ -1,0 +1,67 @@
+# 端口
+server:
+  port: 4544
+
+spring:
+  mvc:
+    # 静态资源访问前缀
+    static-path-pattern: /res/**
+    # rest风格
+    hiddenmethod:
+      filter:
+        enabled: true
+
+    favicon:
+      enabled: false
+
+  # redis
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 1
+
+  # druid数据源配置
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/db_blog2?useUnicode=true&characterEncoding=utf-8
+      username: root
+      password: root@123
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+
+  #thymeleaf
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: LEGACYHTML5
+    encoding: UTF-8
+    servlet:
+      content-type: text/html
+
+# mybaits包扫描、别名
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.zs.pojo
+  config-location: classpath:mybatis-config.xml
+
+# 日志配置
+#logging:
+#  level:
+#    root: info
+#    com.zs: debug
+#  file:
+#    name: log/blog.log
+
+pagehelper:
+  helperDialect: mysql
+  reasonable: true #开启优化，<1页返回第一页
+  supportMethodsArguments: true #是否支持接口参数来传递分页参数，默认false
+  pageSizeZero: false #pageSize=0 返回所有
+  params: count=countSql
+
+postAvatar: /res/images/avatar22.jpg
+replyAvatar: /res/images/avatar23.jpg
+

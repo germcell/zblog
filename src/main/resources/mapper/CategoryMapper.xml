@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zs.mapper.CategoryMapper">
+
+    <resultMap id="categoryMap" type="Category">
+        <id column="cid" property="cid"/>
+        <result column="name" property="name"/>
+        <result column="uid" property="uid"/>
+        <result column="create_time" property="createTime"/>
+        <result column="description" property="description"/>
+        <result column="picture" property="picture"/>
+        <result column="blogCounts" property="blogCounts"/>
+    </resultMap>
+
+    <resultMap id="categorySortMap" type="Category">
+        <id column="cid" property="cid"/>
+        <result column="name" property="name"/>
+        <result column="uid" property="uid"/>
+        <result column="create_time" property="createTime"/>
+        <result column="description" property="description"/>
+        <result column="picture" property="picture"/>
+        <result column="blogCounts" property="blogCounts"/>
+        <result column="blogs" property="blogCounts"/>
+    </resultMap>
+
+    <select id="listCategories" resultMap="categoryMap">
+        select cid,`name`,uid,create_time,description,picture
+        from tb_category
+    </select>
+
+    <insert id="insertCategory">
+        insert into tb_category
+        values(null, #{category.name}, #{category.uid}, now(), #{category.description}, #{category.picture})
+    </insert>
+
+    <select id="listConditionCategories" resultMap="categoryMap">
+        select cid,`name`,uid,create_time,description,picture
+        from tb_category
+        where `name` like '%${condition}%'
+    </select>
+
+    <delete id="deleteCategoryById">
+        delete from tb_category
+        where cid = #{cid}
+    </delete>
+    
+    <select id="getCategory" resultMap="categoryMap">
+        select cid,`name`,uid,create_time,description,picture
+        from tb_category
+        <where>
+            <if test="category.cid != null">
+                cid = #{category.cid}
+            </if>
+            <if test="category.name != null">
+                `name` = #{category.name}
+            </if>
+            <if test="category.uid != null">
+                uid = #{category.uid}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateCategoryById">
+        update tb_category set
+        <if test="category.name != null">
+            name = #{category.name},
+        </if>
+        <if test="category.picture != null">
+            picture = #{category.picture},
+        </if>
+        <if test="category.description != null">
+            description = #{category.description},
+        </if>
+        create_time = now()
+        where cid = #{category.cid}
+    </update>
+
+    <select id="listSortCategoriesByBlogs" resultMap="categorySortMap">
+        select c.cid,c.name,c.picture,c.description,c.create_time,count(bid) blogs
+        from tb_category c left join tb_blog b on c.cid = b.cid
+        group by c.cid
+        order by blogs desc
+    </select>
+</mapper>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zs.mapper.WriterMapper">
+
+    <resultMap id="writerMap" type="com.zs.pojo.Writer">
+        <id column="uid" property="uid"/>
+        <result column="writer_name" property="writerName"/>
+        <result column="writer_sex" property="writerSex"/>
+        <result column="writer_age" property="writerAge"/>
+        <result column="writer_birthday" property="writerBirthday"/>
+        <result column="mail" property="mail"/>
+        <result column="pwd" property="pwd"/>
+        <result column="writer_status" property="writerStatus"/>
+        <result column="writer_avatar" property="writerAvatar"/>
+        <result column="writer_phone" property="writerPhone"/>
+        <result column="writer_introduce" property="writerIntroduce"/>
+        <result column="register_time" property="registerTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="is_member" property="isMember"/>
+        <result column="fans" property="fans"/>
+        <result column="article_num" property="articleNum"/>
+        <result column="all_views" property="allViews"/>
+        <result column="all_like_nums" property="allLikeNums"/>
+    </resultMap>
+
+    <select id="listWriterByCondition" resultMap="writerMap">
+        select uid,writer_name,writer_sex,writer_age,writer_birthday,mail,pwd,writer_status,writer_avatar,
+               writer_phone,writer_introduce,register_time,update_time,is_member,fans,article_num,all_views,all_like_nums
+        from tb_writer
+        <where>
+            <if test="writer.uid != null">and uid=#{writer.uid}</if>
+            <if test="writer.writerName != null">and writer_name=#{writer.writerName}</if>
+            <if test="writer.mail != null">and mail=#{writer.mail}</if>
+            <if test="writer.writerStatus != null">and writer_status=#{writer.writerStatus}</if>
+            <if test="writer.articleNum != null">and article_num>#{writer.articleNum}</if>
+        </where>
+    </select>
+
+    <insert id="insert">
+        insert into tb_writer
+            (`uid`,`writer_name`,`mail`,`pwd`,`writer_status`,
+             `writer_avatar`,`register_time`,`fans`,`article_num`)
+        values
+            (null,#{writer.writerName},#{writer.mail},#{writer.pwd},#{writer.writerStatus},
+             #{writer.writerAvatar},#{writer.registerTime},#{writer.fans},#{writer.articleNum})
+    </insert>
+
+    <update id="updateWriterByUid">
+        update tb_writer
+        <set>
+            <if test="writer.writerName != null">writer_name=#{writer.writerName},</if>
+            <if test="writer.articleNum != null">article_num=#{writer.articleNum},</if>
+            <if test="writer.writerPhone != null">writer_phone=#{writer.writerPhone},</if>
+            <if test="writer.writerSex != null">writer_sex=#{writer.writerSex},</if>
+            <if test="writer.writerBirthday != null">writer_birthday=#{writer.writerBirthday},</if>
+            <if test="writer.writerIntroduce != null">writer_introduce=#{writer.writerIntroduce},</if>
+            <if test="writer.updateTime != null">update_time=#{writer.updateTime},</if>
+            <if test="writer.writerAvatar != null">writer_avatar=#{writer.writerAvatar},</if>
+        </set>
+        where uid = #{writer.uid}
+    </update>
+
+</mapper>

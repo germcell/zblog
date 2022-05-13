@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zs.mapper.BlogOutlineMapper">
+
+    <resultMap id="blogOutlineMap" type="BlogOutline">
+        <id column="did" property="did"/>
+        <result column="title" property="title"/>
+        <result column="views" property="views"/>
+        <result column="outline" property="outline"/>
+        <result column="uid" property="uid"/>
+        <result column="like_num" property="likeNum"/>
+        <result column="first_picture" property="firstPicture"/>
+        <result column="write_time" property="writeTime"/>
+        <result column="is_publish" property="isPublish"/>
+    </resultMap>
+
+    <resultMap id="blogOutlineMapVO" type="com.zs.vo.BlogOutlineVO">
+        <association property="blogOutline" javaType="com.zs.pojo.BlogOutline">
+            <id column="did" property="did"/>
+            <result column="title" property="title"/>
+            <result column="views" property="views"/>
+            <result column="outline" property="outline"/>
+            <result column="uid" property="uid"/>
+            <result column="like_num" property="likeNum"/>
+            <result column="first_picture" property="firstPicture"/>
+            <result column="write_time" property="writeTime"/>
+            <result column="is_publish" property="isPublish"/>
+        </association>
+        <association property="writer" javaType="com.zs.pojo.Writer">
+            <result column="writer_name" property="writerName"/>
+            <result column="writer_sex" property="writerSex"/>
+            <result column="writer_age" property="writerAge"/>
+            <result column="writer_birthday" property="writerBirthday"/>
+            <result column="mail" property="mail"/>
+            <result column="writer_status" property="writerStatus"/>
+            <result column="writer_avatar" property="writerAvatar"/>
+        </association>
+    </resultMap>
+
+    <insert id="insert">
+        insert into tb_blog_outline
+            (did, title, outline, views, uid, like_num, first_picture, write_time, is_publish)
+        values
+            (#{blogOutline.did}, #{blogOutline.title}, #{blogOutline.outline}, #{blogOutline.views}, #{blogOutline.uid},
+             #{blogOutline.likeNum}, #{blogOutline.firstPicture}, #{blogOutline.writeTime}, #{blogOutline.isPublish})
+    </insert>
+
+    <select id="listSortByViewsBlogOutline" resultMap="blogOutlineMap">
+        select did,title,views
+        from tb_blog_outline where is_publish = 1 order by views desc
+    </select>
+
+    <select id="getBlogOutlineById" resultMap="blogOutlineMap">
+        select did,title,outline,views,uid,like_num,first_picture,write_time,is_publish
+        from tb_blog_outline
+        where did = #{bid} and is_publish = 1
+    </select>
+
+    <delete id="deleteByBid">
+        delete from tb_blog_outline where did = #{bid}
+    </delete>
+
+    <update id="updateByCondition">
+        update tb_blog_outline
+        <trim prefix="set" suffixOverrides=",">
+            <if test="bo.title != null and bo.title != ''"> title = #{bo.title}, </if>
+            <if test="bo.outline != null and bo.outline != ''"> outline = #{bo.outline}, </if>
+            <if test="bo.views != null"> views = #{bo.views}, </if>
+            <if test="bo.isPublish != null"> is_publish = #{bo.isPublish}, </if>
+        </trim>
+        <where>
+            <if test="bo.did != null"> and did = #{bo.did} </if>
+        </where>
+    </update>
+
+    <select id="listBlogOutlines" resultMap="blogOutlineMapVO">
+        select bo.did,bo.title,bo.outline,bo.views,bo.uid,bo.like_num,bo.first_picture,bo.write_time,bo.is_publish,
+               w.writer_name,w.writer_sex,w.writer_age,w.writer_birthday,w.mail,w.writer_status,w.writer_avatar
+        from tb_blog_outline bo inner join tb_writer w on bo.uid = w.uid
+        where bo.is_publish = 1 order by bo.write_time desc
+    </select>
+
+    <select id="listBlogOutlinesByUid" resultMap="blogOutlineMap">
+        select did, title, outline, views, uid, like_num, first_picture, write_time, is_publish
+        from tb_blog_outline
+        <where>
+            <if test="uid!=null">and uid = #{uid}</if>
+            <if test="isPublish!=null">and is_publish = #{isPublish}</if>
+        </where>
+    </select>
+
+    <update id="updateByBidAndUid">
+        update tb_blog_outline
+        <set>
+            <if test="bo.title != null">title=#{bo.title},</if>
+            <if test="bo.outline != null">outline=#{bo.outline},</if>
+            <if test="bo.firstPicture != null">first_picture=#{bo.firstPicture},</if>
+        </set>
+        where uid = #{bo.uid} and did = #{bo.did}
+    </update>
+</mapper>

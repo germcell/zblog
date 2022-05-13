@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zs.mapper.BlogMapper">
+
+    <!--  查询所有关联信息  -->
+    <sql id="blogColumn">
+        b.bid,b.title,b.content,b.first_picture,b.cid,b.views,b.is_appreciate,b.is_comment,b.is_publish,b.write_time,b.update_time,b.uid,
+        b.cr_tip_id,b.is_reprint,c.`name`,cr.cr_id,cr.cr_tip,cr.cr_tip_id,u.uid,u.nickname,u.mail,u.avatar,bo.outline,bo.views
+    </sql>
+
+    <!--  查询展示时需要的关联信息  -->
+    <sql id="blogColumnView">
+        b.bid,b.title,b.content,b.first_picture,b.cid,b.views,b.is_appreciate,b.is_comment,b.is_publish,b.write_time,b.update_time,b.uid,
+        b.cr_tip_id,c.`name`,u.nickname,u.avatar,cr_id,cr.cr_tip,cr.cr_tip_id
+    </sql>
+
+    <!--  查询编辑时需要的关联信息  -->
+    <sql id="blogColumnEdit">
+        b.bid,b.title,b.content,b.first_picture,b.cid,b.views,b.is_appreciate,b.is_comment,b.is_publish,b.write_time,b.update_time,b.uid,
+        b.cr_tip_id,c.`name`
+    </sql>
+
+    <resultMap id="blogMap1" type="Blog">
+        <id column="bid" property="bid"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="first_picture" property="firstPicture"/>
+        <result column="cid" property="cid"/>
+        <result column="views" property="views"/>
+        <result column="is_comment" property="isComment"/>
+        <result column="is_publish" property="isPublish"/>
+        <result column="is_appreciate" property="isAppreciate"/>
+        <result column="is_reprint" property="isReprint"/>
+        <result column="write_time" property="writeTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="uid" property="uid"/>
+        <result column="cr_tip_id" property="crTipId"/>
+        <result column="like_num" property="likeNum"/>
+    </resultMap>
+
+    <resultMap id="blogMap" type="Blog">
+        <id column="bid" property="bid"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="first_picture" property="firstPicture"/>
+        <result column="cid" property="cid"/>
+        <result column="views" property="views"/>
+        <result column="is_comment" property="isComment"/>
+        <result column="is_publish" property="isPublish"/>
+        <result column="is_appreciate" property="isAppreciate"/>
+        <result column="is_reprint" property="isReprint"/>
+        <result column="write_time" property="writeTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="uid" property="uid"/>
+        <result column="cr_tip_id" property="crTipId"/>
+        <!--   只查询了tb_category表的name字段，后续需要时在添加     -->
+        <association property="category" javaType="Category">
+            <id column="cid" property="cid"/>
+            <result column="name" property="name"/>
+        </association>
+        <!--   tb_copyright表     -->
+        <association property="copyright" javaType="Copyright">
+            <id column="cr_id" property="crId"/>
+            <result column="cr_tip" property="crTip"/>
+            <result column="cr_tip_id" property="crTipId"/>
+        </association>
+        <!--   tb_user表     -->
+        <association property="user" javaType="User">
+            <id column="uid" property="uid"/>
+            <result column="nickname" property="nickname"/>
+            <result column="avatar" property="avatar"/>
+            <result column="mail" property="mail"/>
+        </association>
+        <!--   tb_blog_outline表     -->
+        <association property="blogOutline" javaType="BlogOutline">
+            <id column="bid" property="did"/>
+            <result column="outline" property="outline"/>
+            <result column="views" property="views"/>
+            <result column="title" property="title"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="blogBaseMap" type="Blog">
+        <id column="bid" property="bid"/>
+        <result column="title" property="title"/>
+        <result column="cid" property="cid"/>
+        <result column="is_publish" property="isPublish"/>
+        <result column="write_time" property="writeTime"/>
+        <result column="uid" property="uid"/>
+        <result column="cr_tip_id" property="crTipId"/>
+        <!--   只查询了tb_category表的name字段，后续需要时在添加     -->
+        <association property="category" javaType="Category">
+            <id column="cid" property="cid"/>
+            <result column="name" property="name"/>
+        </association>
+        <!--   tb_copyright表     -->
+        <association property="copyright" javaType="Copyright">
+            <id column="cr_id" property="crId"/>
+            <result column="cr_tip" property="crTip"/>
+            <result column="cr_tip_id" property="crTipId"/>
+        </association>
+        <!--   tb_user表     -->
+        <association property="user" javaType="User">
+            <id column="uid" property="uid"/>
+            <result column="nickname" property="nickname"/>
+            <result column="mail" property="mail"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="blogVO" type="com.zs.vo.BlogVO">
+        <association property="blog" javaType="com.zs.pojo.Blog">
+            <id column="bid" property="bid"/>
+            <result column="title" property="title"/>
+            <result column="content" property="content"/>
+            <result column="first_picture" property="firstPicture"/>
+            <result column="cid" property="cid"/>
+            <result column="views" property="views"/>
+            <result column="is_appreciate" property="isAppreciate"/>
+            <result column="is_comment" property="isComment"/>
+            <result column="is_reprint" property="isReprint"/>
+            <result column="is_publish" property="isPublish"/>
+            <result column="write_time" property="writeTime"/>
+            <result column="update_time" property="updateTime"/>
+            <result column="uid" property="uid"/>
+            <result column="cr_tip_id" property="crTipId"/>
+            <result column="like_num" property="likeNum"/>
+        </association>
+        <association property="writer" javaType="com.zs.pojo.Writer">
+            <result column="writer_name" property="writerName"/>
+            <result column="writer_avatar" property="writerAvatar"/>
+            <result column="fans" property="fans"/>
+        </association>
+        <association property="category" javaType="com.zs.pojo.Category">
+            <result column="name" property="name"/>
+        </association>
+        <association property="copyright" javaType="com.zs.pojo.Copyright">
+            <result column="cr_tip" property="crTip"/>
+        </association>
+    </resultMap>
+
+    <select id="listBlogs" resultMap="blogMap">
+        select <include refid="blogColumn"/>
+        from tb_blog b
+        inner join tb_category c on b.cid = c.cid
+        inner join tb_copyright cr on cr.cr_tip_id = b.cr_tip_id
+        inner join tb_user u on u.uid = b.uid
+        inner join tb_blog_outline bo on bo.did = b.bid
+        <where>
+            <if test="cid != null">b.cid = #{cid}</if>
+        </where>
+        order by b.write_time desc
+    </select>
+
+    <select id="listConditionBlogs" resultMap="blogMap">
+        select <include refid="blogColumn"/>
+        from tb_blog b
+        inner join tb_category c on b.cid = c.cid
+        inner join tb_copyright cr on cr.cr_tip_id = b.cr_tip_id
+        inner join tb_user u on u.uid = b.uid
+        inner join tb_blog_outline bo on bo.did = b.bid
+        <where>
+            <if test="cid != null"> and b.cid = #{cid} </if>
+            <if test="title != null and title != ''"> and b.title like '%${title}%'</if>
+            <if test="title != null and title != ''"> or b.content like '%${title}%'</if>
+            <if test="isPublish != false"> and b.is_publish = 1</if>
+        </where>
+        order by b.write_time desc
+    </select>
+
+    <delete id="deleteBlogById">
+        delete from tb_blog where bid = #{bid}
+    </delete>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="blog.bid">
+        insert into tb_blog
+            (`bid`, `title`, `content`, `first_picture`, `cid`, `views`, `is_appreciate`,
+             `is_comment`, `is_publish`, `write_time`, `uid`, `cr_tip_id`, `is_reprint`,`like_num`)
+        values
+            (null,#{blog.title},#{blog.content},#{blog.firstPicture},#{blog.cid},#{blog.views},#{blog.isAppreciate}
+            ,#{blog.isComment},#{blog.isPublish},#{blog.writeTime},#{blog.uid},#{blog.crTipId},#{blog.isReprint},#{blog.likeNum})
+    </insert>
+
+    <insert id="insertBlog" useGeneratedKeys="true" keyProperty="blog.bid">
+        insert into tb_blog
+            (`bid`, `title`, `content`, `first_picture`, `cid`, `views`, `is_appreciate`,
+             `is_comment`, `is_publish`, `write_time`, `uid`, `cr_tip_id`, `is_reprint`,`like_num`)
+        values
+           (null,#{blog.title},#{blog.content},#{blog.firstPicture},#{blog.cid},#{blog.views},#{blog.isAppreciate}
+            ,#{blog.isComment},#{blog.isPublish},#{blog.writeTime},#{user.uid},#{blog.crTipId},#{blog.isReprint},#{blog.likeNum})
+    </insert>
+
+    <select id="getBlog" resultMap="blogMap">
+        select <include refid="blogColumnEdit"/>
+        from tb_blog b
+        inner join tb_category c on b.cid = c.cid
+        inner join tb_copyright cr on cr.cr_tip_id = b.cr_tip_id
+        <where>
+            <!-- 动态条件后续用到时再补充 -->
+            <if test="blog.bid != null">and b.bid = #{blog.bid} </if>
+        </where>
+    </select>
+
+    <update id="updateBlogById">
+    update tb_blog
+        <trim prefix="set" suffixOverrides=",">
+            <if test="blog != null"> update_time = now(), </if>
+            <if test="blog.title != null">  title = #{blog.title}, </if>
+            <if test="blog.content != null">  content = #{blog.content}, </if>
+            <if test="blog.cid != null">  cid = #{blog.cid}, </if>
+            <if test="blog.isAppreciate != null">  is_appreciate = #{blog.isAppreciate}, </if>
+            <if test="blog.isComment != null">  is_comment = #{blog.isComment}, </if>
+            <if test="blog.isReprint != null">  is_reprint = #{blog.isReprint}, </if>
+            <if test="blog.isPublish != null">  is_publish = #{blog.isPublish}, </if>
+            <if test="blog.crTipId != null">  cr_tip_id = #{blog.crTipId}, </if>
+            <if test="blog.firstPicture != '' and blog.firstPicture != null">  first_picture = #{blog.firstPicture}, </if>
+            <if test="blog.views != null">  views = #{blog.views}, </if>
+        </trim>
+    where bid = #{bid}
+    </update>
+
+    <select id="getBlogView" resultMap="blogMap">
+        select <include refid="blogColumnView"/>
+        from tb_blog b
+        inner join tb_user u on b.uid = u.uid
+        inner join tb_category c on b.cid = c.cid
+        inner join tb_copyright cr on cr.cr_tip_id = b.cr_tip_id
+        where b.bid = #{bid}
+    </select>
+
+    <select id="getBlogBaseMsg" resultMap="blogBaseMap">
+        select b.bid,b.title,b.cid,b.is_publish,b.write_time,b.uid,b.cr_tip_id,c.`name`,cr.cr_tip,u.nickname,u.mail
+        from tb_blog b
+        inner join tb_category c on b.cid = c.cid
+        inner join tb_copyright cr on cr.cr_tip_id = b.cr_tip_id
+        inner join tb_user u on u.uid = b.uid
+        where b.bid = #{bid}
+    </select>
+
+    <select id="getBlogById" resultMap="blogVO">
+        select
+            b.bid,b.title,b.content,b.first_picture,b.cid,b.views,b.is_appreciate,b.is_comment,b.is_reprint,b.is_publish,
+            b.write_time,b.update_time,b.uid,b.cr_tip_id,b.like_num,
+            w.writer_name,w.writer_avatar,w.fans,
+            c.`name`,
+            cr.cr_tip
+        from tb_blog b
+        inner join tb_writer w on b.uid = w.uid
+        inner join tb_category c on b.cid = c.cid
+        inner join tb_copyright cr on b.cr_tip_id = cr.cr_tip_id
+        where b.bid = #{bid}
+    </select>
+
+    <select id="getBlogByBIdAndUid" resultMap="blogMap1">
+        select bid,title,content,first_picture,cid,views,is_appreciate,is_comment,is_reprint,
+               is_publish,write_time,update_time,uid,cr_tip_id,like_num
+        from tb_blog
+        where bid = #{bid} and uid = #{uid}
+    </select>
+
+    <update id="updateBlogByBIdAndUid">
+        update tb_blog
+        <set>
+            <if test="blog.title != null">title=#{blog.title},</if>
+            <if test="blog.content != null">content=#{blog.content},</if>
+            <if test="blog.firstPicture != null">first_picture=#{blog.firstPicture},</if>
+            <if test="blog.cid != null">cid=#{blog.cid},</if>
+            <if test="blog.views != null">views=#{blog.views},</if>
+            <if test="blog.isAppreciate != null">is_appreciate=#{blog.isAppreciate},</if>
+            <if test="blog.isComment != null">is_comment=#{blog.isComment},</if>
+            <if test="blog.isReprint != null">is_reprint=#{blog.isReprint},</if>
+            <if test="blog.isPublish != null">is_publish=#{blog.isPublish},</if>
+            <if test="blog.writeTime != null">write_time=#{blog.writeTime},</if>
+            <if test="blog.updateTime != null">update_time=#{blog.updateTime},</if>
+            <if test="blog.uid != null">uid=#{blog.uid},</if>
+            <if test="blog.crTipId != null">cr_tip_id=#{blog.crTipId},</if>
+            <if test="blog.likeNum != null">like_num=#{blog.likeNum},</if>
+        </set>
+        where uid = #{blog.uid} and bid = #{blog.bid}
+    </update>
+
+</mapper>

@@ -1,0 +1,13 @@
+### Example user template template
+### Example user template
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen
+blog_log
+target
+src/main/resources/static
+src/main/resources/templates
+

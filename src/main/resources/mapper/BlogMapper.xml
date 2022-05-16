@@ -55,18 +55,15 @@
         <result column="update_time" property="updateTime"/>
         <result column="uid" property="uid"/>
         <result column="cr_tip_id" property="crTipId"/>
-        <!--   只查询了tb_category表的name字段，后续需要时在添加     -->
         <association property="category" javaType="Category">
             <id column="cid" property="cid"/>
             <result column="name" property="name"/>
         </association>
-        <!--   tb_copyright表     -->
         <association property="copyright" javaType="Copyright">
             <id column="cr_id" property="crId"/>
             <result column="cr_tip" property="crTip"/>
             <result column="cr_tip_id" property="crTipId"/>
         </association>
-        <!--   tb_user表     -->
         <association property="user" javaType="User">
             <id column="uid" property="uid"/>
             <result column="nickname" property="nickname"/>
@@ -250,6 +247,14 @@
         inner join tb_category c on b.cid = c.cid
         inner join tb_copyright cr on b.cr_tip_id = cr.cr_tip_id
         where b.bid = #{bid}
+    </select>
+
+    <select id="getBlogByBid" resultMap="blogMap1">
+        select
+            bid,title,content,first_picture,cid,views,is_appreciate,is_comment,is_reprint,is_publish,
+            write_time,update_time,uid,cr_tip_id,like_num
+        from tb_blog
+        where is_publish = 1 and bid = #{bid}
     </select>
 
     <select id="getBlogByBIdAndUid" resultMap="blogMap1">

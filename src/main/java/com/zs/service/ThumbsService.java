@@ -18,9 +18,23 @@ public interface ThumbsService {
     ResultVO like(ThumbsDTO thumbsDTO) throws JsonProcessingException;
 
     /**
-     * 获取用户所有点赞记录
+     * 获取文章点赞数
      * @param mid 用户id
      * @return
      */
-    ResultVO getLikesByMid(Long mid) throws JsonProcessingException;
+    ResultVO getLikesByBid(Long mid) throws JsonProcessingException;
+
+    /**
+     * 判断用户是否已为当前文章点赞
+     * @param thumbsDTO 点赞信息
+     * @return
+     */
+    ResultVO isLike(ThumbsDTO thumbsDTO) throws JsonProcessingException;
+
+    /**
+     * 取消点赞
+     * @param thumbsDTO
+     * @return
+     */
+    ResultVO cancelLike(ThumbsDTO thumbsDTO);
 }

@@ -67,4 +67,11 @@ public interface BlogOutlineMapper {
      * @return
      */
     int updateByBidAndUid(@Param("bo") BlogOutline bo);
+
+    /**
+     * 根据bid获取文章概要信息
+     * @param bid 文章id
+     * @return
+     */
+    BlogOutline getBlogOutlineByBid(@Param("bid") Long bid);
 }

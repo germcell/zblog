@@ -99,4 +99,10 @@
         </set>
         where uid = #{bo.uid} and did = #{bo.did}
     </update>
+
+    <select id="getBlogOutlineByBid" resultMap="blogOutlineMap">
+        select did, title, outline, views, uid, like_num, first_picture, write_time, is_publish
+        from tb_blog_outline
+        where is_publish = 1 and did = #{bid}
+    </select>
 </mapper>

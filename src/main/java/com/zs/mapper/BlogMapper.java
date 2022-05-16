@@ -116,5 +116,12 @@ public interface BlogMapper {
      * @return
      */
     int updateBlogByBIdAndUid(@Param("blog") Blog blog);
+
+    /**
+     * 按bid查询
+     * @param bid 文章id
+     * @return
+     */
+    Blog getBlogByBid(@Param("bid") Long bid);
 }
 

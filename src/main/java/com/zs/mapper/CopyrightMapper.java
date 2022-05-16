@@ -2,6 +2,7 @@ package com.zs.mapper;
 
 import com.zs.pojo.Copyright;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -16,5 +17,12 @@ public interface CopyrightMapper {
      * @return
      */
     List<Copyright> listCopyright();
+
+    /**
+     * 按版权id查询
+     * @param crTipId 版权id
+     * @return
+     */
+    Copyright getCopyRightByCrTipId(@Param("crTipId") Integer crTipId);
 
 }

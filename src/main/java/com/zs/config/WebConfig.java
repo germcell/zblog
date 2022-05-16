@@ -34,7 +34,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/v2/lr/register.do")
                 .excludePathPatterns("/v2/lr/code")
                 .excludePathPatterns("/v2/lr/check")
-                .excludePathPatterns("/v2/lr/access/**");
+                .excludePathPatterns("/v2/lr/access/**")
+                .excludePathPatterns("/v2/thumbs-up/get/*");
     }
 
     /* 实时显示上传后的文件，而不需重启服务器 */

@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zs.config.Const;
 import com.zs.config.Const2;
+import com.zs.config.ConstRedisKeyPrefix;
 import com.zs.handler.*;
 import com.zs.mapper.*;
 import com.zs.pojo.*;
@@ -42,6 +43,12 @@ public class BlogServiceImpl implements BlogService {
     private CommentMapper commentMapper;
     @Resource
     private WriterMapper writerMapper;
+    @Resource
+    private ArticleRedisHelper articleRedisHelper;
+    @Resource
+    private ThumbsRedisHelper thumbsRedisHelper;
+    @Resource
+    private CopyrightMapper copyrightMapper;
 
     @Override
     public PageInfo<Blog> listPageBlogs(Integer currentPage, Integer rows) {
@@ -215,16 +222,52 @@ public class BlogServiceImpl implements BlogService {
             return new ResultVO(Const2.SERVICE_FAIL, "fail: article id is null", null);
         }
         try {
-            BlogVO blogById = blogMapper.getBlogById(bid);
-            String htmlData = MarkdownUtils.markdownToHtmlExtensions(blogById.getBlog().getContent());
-            blogById.getBlog().setContent(htmlData);
-            return new ResultVO(Const2.SERVICE_SUCCESS, "success", blogById);
+            // 1.先查询缓存是否有文章信息
+            BlogVO blogVOByBidToRedis = articleRedisHelper.getArticleCacheByBid(ConstRedisKeyPrefix.ALL_ARTICLE_CACHE, bid + "");
+            if (blogVOByBidToRedis != null) {
+                return new ResultVO(Const2.SERVICE_SUCCESS, "success", blogVOByBidToRedis);
+            }
+            // 2.1 查询文章信息
+            BlogVO blogVO = new BlogVO();
+            Blog blog =  blogMapper.getBlogByBid(bid);
+            if (blog == null) {
+                return new ResultVO(Const2.SERVICE_FAIL, "article not found", null);
+            }
+            String htmlData = MarkdownUtils.markdownToHtmlExtensions(blog.getContent());
+            blog.setContent(htmlData);
+            blogVO.setBlog(blog);
+            // 2.1.1 将文章点赞数缓存到redis中
+            String key = ConstRedisKeyPrefix.ARTICLE_ALL_LIKES_PREFIX + blog.getBid();
+            String value = String.valueOf(blog.getLikeNum());
+            thumbsRedisHelper.cacheArticleLikeNum(key, value);
+            // 2.2 查询作者信息
+            Writer condition1 = new Writer();
+            condition1.setUid(blog.getUid());
+            List<Writer> writers = writerMapper.listWriterByCondition(condition1);
+            if (writers == null || writers.size() == 0) {
+                return new ResultVO(Const2.SERVICE_FAIL, "writer not found", null);
+            }
+            writers.get(0).setPwd(null);
+            blogVO.setWriter(writers.get(0));
+            // 2.3 查询文章分类信息
+            Category condition2 = new Category();
+            condition2.setCid(blog.getCid());
+            Category category = categoryMapper.getCategory(condition2);
+            if (category == null) {
+                return new ResultVO(Const2.SERVICE_FAIL, "article category not found", null);
+            }
+            blogVO.setCategory(category);
+            // 2.4 查询版权信息
+            Copyright copyright = copyrightMapper.getCopyRightByCrTipId(blog.getCrTipId());
+            blogVO.setCopyright(copyright);
+            // 2.5 缓存到redis中
+            articleRedisHelper.cacheArticle(ConstRedisKeyPrefix.ALL_ARTICLE_CACHE, String.valueOf(bid), blogVO);
+            return new ResultVO(Const2.SERVICE_SUCCESS, "success", blogVO);
         } catch (Exception e) {
             logger.info("查询文章信息异常");
             e.printStackTrace();
             return new ResultVO(Const2.SERVICE_FAIL, "exception", null);
         }
-
     }
 
     /**

@@ -14,4 +14,8 @@
         select cr_id,cr_tip,cr_tip_id
         from tb_copyright
     </select>
+
+    <select id="getCopyRightByCrTipId" resultMap="copyrightMap">
+        select cr_id,cr_tip,cr_tip_id from tb_copyright where cr_tip_id = #{crTipId}
+    </select>
 </mapper>

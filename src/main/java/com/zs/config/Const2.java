@@ -9,8 +9,10 @@ package com.zs.config;
 public class Const2 {
 
     public static final String DEFAULT_WRITER_AVATAR = "common_avatar.png"; // 注册时默认用户头像
-    public static final String ARTICLE_PICTURE_SAVE_DIR_WINDOWS = "C:/Users/Air/Desktop/blog/blog_static/images/fp/";
-    public static final String USER_AVATAR_SAVE_DIR_WINDOWS = "C:/Users/Air/Desktop/blog/blog_static/images/avatar/";
+//    public static final String ARTICLE_PICTURE_SAVE_DIR_WINDOWS = "C:/Users/Air/Desktop/blog/blog_static/images/fp/";
+//    public static final String USER_AVATAR_SAVE_DIR_WINDOWS = "C:/Users/Air/Desktop/blog/blog_static/images/avatar/";
+    public static final String ARTICLE_PICTURE_SAVE_DIR_WINDOWS = "C:/Users/Air/Desktop/blog/blog_v2.0-frontEnd/blog_static/images/fp";
+    public static final String USER_AVATAR_SAVE_DIR_WINDOWS = "C:/Users/Air/Desktop/blog/blog_v2.0-frontEnd/blog_static/images/avatar";
     public static final String ARTICLE_PICTURE_SAVE_DIR_LINUX = "/usr/local/server/nginx/blog_static/images/fp/";
     public static final String USER_AVATAR_SAVE_DIR_LINUX = "/usr/local/server/nginx/blog_static/images/avatar/";
 
@@ -43,4 +45,25 @@ public class Const2 {
     public static final Integer SEND_MAIL_SUCCESS = 612; // 验证码邮箱发送成功
 
     public static final Integer ALREADY_FOLLOW = 701; // 关注用户失败，已经关注了
+
+    /**
+     * 用户还未给文章点赞
+     */
+    public static final Integer NO_LIKE = 753;
+
+    /**
+     * 用户已经为文章点赞
+     */
+    public static final Integer ALREADY_LIKE = 754;
+
+    /**
+     * 取消点赞成功
+     */
+    public static final Integer CANCEL_LIKE_SUCCESS = 756;
+
+    /**
+     * 取消点赞失败
+     */
+    public static final Integer CANCEL_LIKE_FAIL = 755;
+
 }

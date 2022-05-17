@@ -225,6 +225,11 @@ public class BlogServiceImpl implements BlogService {
             // 1.先查询缓存是否有文章信息
             BlogVO blogVOByBidToRedis = articleRedisHelper.getArticleCacheByBid(ConstRedisKeyPrefix.ALL_ARTICLE_CACHE, bid + "");
             if (blogVOByBidToRedis != null) {
+                // 有缓存时，将redis中最新的文章点赞数量更新
+                Long articleLikeNum = thumbsRedisHelper.getArticleLikeNum(ConstRedisKeyPrefix.ARTICLE_ALL_LIKES_PREFIX + bid);
+                if (articleLikeNum != null) {
+                    blogVOByBidToRedis.getBlog().setLikeNum(articleLikeNum);
+                }
                 return new ResultVO(Const2.SERVICE_SUCCESS, "success", blogVOByBidToRedis);
             }
             // 2.1 查询文章信息

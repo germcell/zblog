@@ -19,13 +19,13 @@
     <select id="listByCondition" resultMap="baseMap">
         select fid,uid,uid2,join_time from tb_fans
         <where>
-            <if test="fans.uid!=null">and uid = #{fans.uid}</if>
+            <if test="fans.uid2!=null">and uid2 = #{fans.uid2}</if>
         </where>
     </select>
 
     <delete id="deleteByCondition">
         delete from tb_fans
-        where uid = #{fans.uid} and uid2 = #{fans.uid2}
+        where uid = #{fans.listByConditionuid} and uid2 = #{fans.uid2}
     </delete>
 
 </mapper>

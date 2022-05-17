@@ -47,7 +47,7 @@ public class ScheduledTask {
     /**
      * 每隔10分钟执行一次，同步redis中存储的博客点击（浏览）量
      */
-    @Scheduled(cron = "0 0/10 * * * ?")
+//    @Scheduled(cron = "0 0/10 * * * ?")
     public void viewsSyncTask() {
         try {
             int rows = viewsAndLikesService.saveView();
@@ -62,7 +62,7 @@ public class ScheduledTask {
     /**
      *  每隔 1h 执行一次，清除imageMap集合、删除未使用的文件
      */
-    @Scheduled(cron = "0 0/59 * * * ?")
+//    @Scheduled(cron = "0 0/59 * * * ?")
     public void discardFileTask() {
         // 获取集合数据
         Set<Map.Entry<String, List<String>>> entries = imageMap.entrySet();
@@ -101,14 +101,14 @@ public class ScheduledTask {
      */
     // TODO 同步任务时间设置
 //    @Scheduled(cron = "0 0 0 ? * ?")
-    @Scheduled(cron = "0 0/5 * * * ?")
-    public void syncFansTask() throws JsonProcessingException {
-        try {
-            logger.info("开始同步redis中的关注信息到DB");
-            ResultVO resultVO = fansService.syncFans();
-            logger.info("同步完成，共涉及到 "+ resultVO.getData() +" 个用户");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    @Scheduled(cron = "0 0/5 * * * ?")
+//    public void syncFansTask() throws JsonProcessingException {
+//        try {
+//            logger.info("开始同步redis中的关注信息到DB");
+//            ResultVO resultVO = fansService.syncFans();
+//            logger.info("同步完成，共涉及到 "+ resultVO.getData() +" 个用户");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 }

@@ -84,6 +84,9 @@ public class ThumbsRedisHelper {
      */
     public Long getArticleLikeNum(String key) {
         String s = stringRedisTemplate.boundValueOps(key).get();
+        if (s == null) {
+            return null;
+        }
         if (StringUtils.hasText(s)) {
             return Long.parseLong(s);
         }

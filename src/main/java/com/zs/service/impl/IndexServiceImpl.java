@@ -4,6 +4,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zs.config.Const;
 import com.zs.config.Const2;
+import com.zs.config.ConstRedisKeyPrefix;
+import com.zs.handler.ArticleRedisHelper;
 import com.zs.handler.RandomUtils;
 import com.zs.mapper.AdMapper;
 import com.zs.mapper.BlogOutlineMapper;
@@ -35,6 +37,8 @@ public class IndexServiceImpl implements IndexService {
     private BlogOutlineMapper blogOutlineMapper;
     @Resource
     private WriterMapper writerMapper;
+    @Resource
+    private ArticleRedisHelper articleRedisHelper;
 
     private Logger logger = LoggerFactory.getLogger(IndexServiceImpl.class);
 
@@ -45,6 +49,11 @@ public class IndexServiceImpl implements IndexService {
     @Override
     public ResultVO getIndexData() {
         try {
+            HashMap<String, Object> indexPageData = articleRedisHelper.getIndexPageData(ConstRedisKeyPrefix.INDEX_PAGE_DATA);
+            if (indexPageData != null) {
+                // TODO 缓存穿透
+                return new ResultVO(Const2.SERVICE_SUCCESS, "success", indexPageData);
+            }
             HashMap<String,Object> map = new HashMap<>();
             // 1.查询第一页的文章概要信息，已按发布时间降序排列
             PageHelper.startPage(1, Const.BLOG_PAGE_ROWS);
@@ -80,11 +89,11 @@ public class IndexServiceImpl implements IndexService {
             PageInfo<BlogOutline> viewSortPageInfo = new PageInfo<>(viewSort);
             map.put("hotArticle", viewSortPageInfo);
             // 5.封装返回数据
-            // TODO 因为首页数据大多数人访问的都是一样的，可考虑将此数据做缓存
+            articleRedisHelper.cacheIndexPageData(ConstRedisKeyPrefix.INDEX_PAGE_DATA, map);
             ResultVO resultVO = new ResultVO(Const2.SERVICE_SUCCESS, "success", map);
             return resultVO;
         } catch (Exception e) {
-            logger.info("获取首页数据失败");
+            logger.info("获取首页数据失败{}", e);
             ResultVO resultVO = new ResultVO(Const2.SERVICE_FAIL, "fail", null);
             return resultVO;
         }

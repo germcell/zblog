@@ -16,7 +16,7 @@ import java.util.Date;
 @ToString
 public class Fans {
     private Long fid;
-    private Long uid; // 关注人id
-    private Long uid2; // 被关注人id
+    private Long uid; // 被关注人id
+    private Long uid2; // 主关注人id
     private Date joinTime;
 }

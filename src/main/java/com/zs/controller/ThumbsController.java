@@ -41,20 +41,6 @@ public class ThumbsController {
             return thumbsService.like(thumbsDTO);
         }
         return new ResultVO(Const2.PARAMETERS_IS_NULL, "parameters should not be null", null);
-
-        // 注释：参数方法测试
-//        if (thumbsDTO != null) {
-//            if (thumbsDTO.getBid() != null && thumbsDTO.getMid() != null && thumbsDTO.getUid() != null) {
-//                try {
-//                    return thumbsService.like(thumbsDTO);
-//                } catch(JsonProcessingException e) {
-//                    e.printStackTrace();
-//                    logger.info("点赞接口json序列化异常");
-//                    return new ResultVO(Const2.SERVICE_FAIL, "fail", null);
-//                }
-//            }
-//        }
-//        return new ResultVO(Const2.PARAMETERS_IS_NULL, "parameters should not be null", null);
     }
 
     /**
@@ -94,20 +80,6 @@ public class ThumbsController {
             return thumbsService.isLike(thumbsDTO);
         }
         return new ResultVO(Const2.PARAMETERS_IS_NULL, "parameters should not be null", null);
-
-        // 参数方法测试
-//        if (thumbsDTO != null) {
-//            if (thumbsDTO.getBid() != null && thumbsDTO.getMid() != null && thumbsDTO.getUid() != null) {
-//                try {
-//                    return thumbsService.isLike(thumbsDTO);
-//                } catch (JsonProcessingException e) {
-//                    e.printStackTrace();
-//                    logger.info("获取用户点赞状态接口json序列化异常");
-//                    return new ResultVO(Const2.SERVICE_FAIL, "fail", null);
-//                }
-//            }
-//        }
-//        return new ResultVO(Const2.PARAMETERS_IS_NULL, "parameters should not be null", null);
     }
 
     /**

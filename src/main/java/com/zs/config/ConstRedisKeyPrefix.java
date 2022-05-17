@@ -29,4 +29,21 @@ public class ConstRedisKeyPrefix {
      * 每篇文章的点赞数
      */
     public final static String ARTICLE_ALL_LIKES_PREFIX = "articleAllLikes_";
+
+    /**
+     * 首页数据
+     */
+    public final static String INDEX_PAGE_DATA = "indexPageData";
+
+    /**
+     * 用户数据库中的关注列表
+     */
+//    public final static String WRITER_FANS_TO_DB = "allWriterFansToDB_";
+
+    /**
+     * 用户的关注列表
+     */
+    public final static String WRITER_FANS_TO_REDIS = "allWriterFans_";
+
+
 }

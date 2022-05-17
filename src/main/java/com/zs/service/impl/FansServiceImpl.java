@@ -143,4 +143,17 @@ public class FansServiceImpl implements FansService {
 //        return new ResultVO(Const2.REGISTER_SUCCESS, "success", keys.size());
 //    }
 
+
+    /**
+     * 获取请求用户对访问用户的关注状态
+     * @param fans
+     * @return
+     */
+    @Override
+    public ResultVO getFollowStatus(Fans fans) {
+        String key = ConstRedisKeyPrefix.WRITER_FANS_TO_REDIS + fans.getUid2();
+        String value = String.valueOf(fans.getUid());
+        Boolean follow = fansRedisHelper.isFollow(key, value);
+        return new ResultVO(Const2.SERVICE_SUCCESS, "success", follow);
+    }
 }

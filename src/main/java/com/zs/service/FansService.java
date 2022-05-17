@@ -39,4 +39,10 @@ public interface FansService {
      */
 //    ResultVO syncFans() throws JsonProcessingException;
 
+    /**
+     * 获取请求用户对访问用户的关注状态
+     * @param fans
+     * @return
+     */
+    ResultVO getFollowStatus(Fans fans);
 }

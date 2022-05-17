@@ -1,6 +1,7 @@
 package com.zs.controller;
 
 import com.zs.config.Const2;
+import com.zs.dto.ThumbsDTO;
 import com.zs.pojo.Fans;
 import com.zs.service.FansService;
 import com.zs.vo.ResultVO;
@@ -61,6 +62,20 @@ public class FansController {
             return fansService.unFollow(fans);
         }
         return new ResultVO(Const2.PARAMETERS_IS_NULL, "request parameter is null", null);
+    }
+
+    /**
+     * 获取请求用户对访问用户的关注状态
+     * @param token
+     * @param fans
+     * @return
+     */
+    @PostMapping("/status")
+    public ResultVO status(@RequestHeader String token, @RequestBody Fans fans) {
+        if (paramsCheck(fans)) {
+            return fansService.getFollowStatus(fans);
+        }
+        return new ResultVO(Const2.PARAMETERS_IS_NULL, "request parameter is null", false);
     }
 
     /**

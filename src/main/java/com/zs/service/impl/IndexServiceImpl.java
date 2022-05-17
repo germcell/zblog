@@ -51,7 +51,7 @@ public class IndexServiceImpl implements IndexService {
         try {
             HashMap<String, Object> indexPageData = articleRedisHelper.getIndexPageData(ConstRedisKeyPrefix.INDEX_PAGE_DATA);
             if (indexPageData != null) {
-                // TODO 缓存穿透
+                // TODO 因为设置了过期时间，所以要防止缓存穿透
                 return new ResultVO(Const2.SERVICE_SUCCESS, "success", indexPageData);
             }
             HashMap<String,Object> map = new HashMap<>();
@@ -78,8 +78,9 @@ public class IndexServiceImpl implements IndexService {
             Writer condition = new Writer();
             condition.setWriterStatus(1);
             condition.setArticleNum(5);
-            PageHelper.startPage(1, 5);
+            PageHelper.startPage(1, 7);
             List<Writer> writers = writerMapper.listWriterByCondition(condition);
+            writers.stream().forEach(w -> {w.setPwd(null);});
             PageInfo<Writer> writerPageInfo = new PageInfo<>(writers);
             map.put("writers", writerPageInfo.getList());
             // 4.查询浏览量前15的文章概要信息(排行榜)

@@ -37,7 +37,7 @@ public interface FansService {
      * 同步redis中的关注信息到DB
      * @return
      */
-//    ResultVO syncFans() throws JsonProcessingException;
+    ResultVO syncFans();
 
     /**
      * 获取请求用户对访问用户的关注状态

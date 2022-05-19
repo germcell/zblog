@@ -105,4 +105,10 @@
         from tb_blog_outline
         where is_publish = 1 and did = #{bid}
     </select>
+
+    <select id="topNArticlesViewedByUid" resultMap="blogOutlineMap">
+        select did,title,views,uid,is_publish
+        from tb_blog_outline
+        where is_publish = 1 and uid = #{uid} limit 0,#{n}
+    </select>
 </mapper>

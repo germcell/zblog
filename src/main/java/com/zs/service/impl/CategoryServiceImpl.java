@@ -1,11 +1,15 @@
 package com.zs.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.mysql.cj.log.Log;
 import com.sun.glass.ui.Size;
 import com.zs.config.Const;
 import com.zs.config.Const2;
+import com.zs.config.ConstRedisKeyPrefix;
+import com.zs.handler.CategoryRedisHelper;
+import com.zs.handler.UniversalException;
 import com.zs.mapper.BlogMapper;
 import com.zs.mapper.CategoryMapper;
 import com.zs.pojo.Blog;
@@ -13,11 +17,15 @@ import com.zs.pojo.Category;
 import com.zs.pojo.RequestResult;
 import com.zs.service.CategoryService;
 import com.zs.vo.ResultVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @Created by zs on 2022/2/24.
@@ -27,8 +35,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Autowired
     private CategoryMapper categoryMapper;
+
     @Autowired
     private BlogMapper blogMapper;
+
+    @Resource
+    private CategoryRedisHelper categoryRedisHelper;
 
     /**
      * 分页查询分类
@@ -142,16 +154,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     /**
-     * 查询所有分类(2.0)
-     * @return
-     */
-    @Override
-    public ResultVO listCategories(Integer status) {
-        return new ResultVO(Const2.SERVICE_SUCCESS, "success", categoryMapper.listCategories());
-    }
-
-    /**
-     * 查询前 6 个分类，按分类下所存在博客数量排序
+     * 查询前 6 个分类，按分类下所存在博客数量排序（热门分类）
      * @return
      */
     @Override
@@ -161,5 +164,26 @@ public class CategoryServiceImpl implements CategoryService {
             return list.subList(0, 6);
         }
         return list;
+    }
+
+    /*********************************** 2.0 ******************************************/
+
+    /**
+     * 查询所有分类(2.0)
+     * @return
+     */
+    @Override
+    public ResultVO listCategories(Integer status) {
+        try {
+            List categories = categoryRedisHelper.getAll(ConstRedisKeyPrefix.ALL_CATEGORIES);
+            if (Objects.isNull(categories)) {
+                categories = categoryMapper.listCategories();
+                categoryRedisHelper.cache(ConstRedisKeyPrefix.ALL_CATEGORIES, categories);
+                return new ResultVO(Const2.SERVICE_SUCCESS, "success", categories);
+            }
+            return new ResultVO(Const2.SERVICE_SUCCESS, "success", categories);
+        } catch (JsonProcessingException e) {
+            throw new UniversalException("获取文章分类信息异常", e);
+        }
     }
 }

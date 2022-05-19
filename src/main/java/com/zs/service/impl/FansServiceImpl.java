@@ -14,11 +14,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+
 /**
  * @Created by zs on 2022/4/30.
  */
 @Service
 public class FansServiceImpl implements FansService {
+
+    private Logger logger = LoggerFactory.getLogger(FansServiceImpl.class);
 
     @Resource
     private FansMapper fansMapper;
@@ -96,53 +101,115 @@ public class FansServiceImpl implements FansService {
 
     /**
      * 同步redis中的关注信息到DB
+     *   因为用户关注记录是存储在redis中的，可选择将记录同步到数据库。
+     *   redis储存的以【allWriterFans_ + 用户id】为key，被关注用户id为value的set集合。
+     *   同步规则：
+     *      1.获取所有满足allWriterFans_为前缀的key；
+     *      2.遍历每一个key，获取key对应的value；(Set<String>) 【主，因为redis中的数据才是最新的关注信息，可能会在原有基础上取关，所以要以redis为主，DB为辅】
+     *      3.判断value是否不为null，或长度不为0；
+     *      4.根据key截取得到用户id，从数据库中查询用户所有的关注记录；(List<Fans>)
+     *      5.使用Redis中的数据和DB中的数据进行匹配，得到 addSet<String>；
+     *      6.使用DB中的数据和Redis中的数据进行匹配，得到 delList<Fans>；
+     *      7.执行删除操作
+     *      8.执行添加操作
+     *      9.返回结果
+     *
+     *      步骤5->逻辑
+     *      数据库查询结果：List [{id:1, uid:1, uid2:7},{id:2, uid:3, uid2:7},{id:3, uid:5, uid2:7}]  用户7关注了用户1,3,5 DB
+     *      Redis查询结果：Set  [1,2,3,4] 用户7关注了1,2,3,4 Redis
+     *
+     *      delList【匹配后需要删除的记录】 5
+     *      addList【匹配后需要新增的记录】 2 4
+     *
+     *      set 1 3
+     *      list 1 3
+     *      【set发起匹配，在DB中匹配到，不操作】
+     *
+     *      set 2
+     *      list 1 3
+     *      【set发起匹配，在DB中未匹配到，需新增 addSet.add()】
+     *
+     *      set 4
+     *      list 1 3 5
+     *      【set发起匹配，在DB中未匹配到，需新增 addSet.add()】
+     *
+     *      list 1 3 5
+     *      set 1 2 3 4
+     *      【list发起匹配，匹配不成功的需删除 delList.add()】
+     *
      * @return
      */
-//    @Override
-//    public ResultVO syncFans() throws JsonProcessingException {
-//        // keys集合储存所有的键，每个用户的关注记录
-//        Set<String> keys = fansRedisHelper.allFansOfKey("F-*");
-//        if (keys.size() == 0) {
-//            return new ResultVO(Const2.REGISTER_SUCCESS, "success", keys.size());
-//        }
-//        Fans f = new Fans();
-//        Set<String> values = null;
-//        Iterator<String> keysIt = keys.iterator();
-//        Iterator<String> valuesIt = null;
-//        // 1.遍历查询到的所有key
-//        while (keysIt.hasNext()) {
-//            String k = keysIt.next(); // F-2
-//            // 2.获取key对应的value
-//            values = fansRedisHelper.allFans(k);
-//            Long k_l = null;
-//            if (values.size() > 0) {
-//                // 4.格式化key 【"F-2" -> 2】，作为uid
-//                k_l = Long.parseLong(k.split("-")[1]);
-//                // 5.遍历对应的value
-//                valuesIt = values.iterator();
-//                while (valuesIt.hasNext()) {
-//                    String v = valuesIt.next();
-//                    // 6.格式化value 【"1" -> 1】，作为uid2
-//                    Long v_l = Long.parseLong(v);
-//                    // 7.插入记录
-//                    f.setUid(k_l);
-//                    f.setUid2(v_l);
-//                    f.setJoinTime(new Date());
-//                    fansMapper.insert(f);
-//                    // 8.清除DB-2
-//                    fansRedisHelper.removeKey("DB-" + k_l);
-//                    // 9.更新DB-2到redis
-//                    Fans condition = new Fans();
-//                    condition.setUid(k_l);
-//                    fansRedisHelper.cacheRedis("DB-" + k_l, fansMapper.listByCondition(condition));
-//                    // 10.插入数据库后，清除key
-//                    fansRedisHelper.removeKey(k);
-//                }
-//            }
-//        }
-//        return new ResultVO(Const2.REGISTER_SUCCESS, "success", keys.size());
-//    }
+    @Override
+    public ResultVO syncFans() {
+        AtomicInteger row = new AtomicInteger(0);
+        FansUtils fansUtils = new FansUtils();
+        Fans condition = new Fans();
 
+        /**
+         * TODO 考虑到处理用户量多的情况，选择创建一个线程池来执行同步操作
+         */
+//        int systemThreads = Runtime.getRuntime().availableProcessors();
+//        ThreadPoolExecutor executor = new ThreadPoolExecutor((systemThreads / 2),
+//                                                              systemThreads,
+//                                                              5,
+//                                                              TimeUnit.SECONDS,
+//                                                              new ArrayBlockingQueue<>(10),
+//                                                              Executors.defaultThreadFactory(),
+//                                                              new ThreadPoolExecutor.DiscardOldestPolicy());
+
+        // step1
+        Set<String> keys = fansRedisHelper.getPatternKey(ConstRedisKeyPrefix.WRITER_FANS_TO_REDIS + "*");
+        if (Objects.isNull(keys)) {
+            return new ResultVO(Const2.SYNC_SUCCESS_NO_OPERATION, "success,no operation", null);
+        }
+        // step2
+        keys.stream().forEach((key) -> {
+            // step3 value是用户在redis中关注记录的集合
+            Set<String> value = fansRedisHelper.getAllFans(key);
+            if (!Objects.isNull(value)) {
+                // step4 fansByUid2是用户在数据库中的关注记录的集合
+                long uid2 = Long.parseLong(key.split("_")[1]);
+                condition.setUid2(uid2);
+                List<Fans> fansByUid2 = fansMapper.listByCondition(condition);
+
+                // step5 得到需要新增的记录集合
+                Set<String> addSet = value.stream()
+                        .filter((v) -> !fansUtils.isContains(fansByUid2, v))
+                        .collect(Collectors.toSet());
+
+                // step6 得到需要删除的记录集合
+                List<Fans> delList = fansByUid2.stream().filter((f) -> {
+                    if (!value.contains(String.valueOf(f.getUid()))) {
+                        return true;
+                    }
+                    return false;
+                }).collect(Collectors.toList());
+
+                // step7
+                delList.forEach((df) -> {
+                    try {
+                        fansMapper.deleteByCondition(df);
+                    } catch (Exception e) {
+                        logger.info("同步Fans数据表记录异常【删除】{}", e);
+                    }
+                });
+
+                // step8
+                Fans save = new Fans();
+                addSet.forEach((as) -> {
+                    long uid = Long.parseLong(as);
+                    save.setUid(uid);
+                    save.setUid2(uid2);
+                    save.setJoinTime(new Date());
+                    fansMapper.insert(save);
+                });
+                row.incrementAndGet();
+            }
+        });
+
+        // step9
+        return new ResultVO(Const2.SYNC_SUCCESS, "sync tb_fans success", row);
+    }
 
     /**
      * 获取请求用户对访问用户的关注状态
@@ -156,4 +223,18 @@ public class FansServiceImpl implements FansService {
         Boolean follow = fansRedisHelper.isFollow(key, value);
         return new ResultVO(Const2.SERVICE_SUCCESS, "success", follow);
     }
+
+    class FansUtils {
+        /**
+         * DB是否包含Redis的记录
+         * @param fans
+         * @param uid
+         * @return
+         */
+        public Boolean isContains(List<Fans> fans, String uid) {
+            return fans.stream().anyMatch((f) -> Objects.equals(uid, String.valueOf(f.getUid())));
+        }
+    }
 }
+
+

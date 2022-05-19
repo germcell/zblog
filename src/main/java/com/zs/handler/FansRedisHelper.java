@@ -79,4 +79,20 @@ public class FansRedisHelper {
     public Long unfollow(String key, String value) {
         return stringRedisTemplate.boundSetOps(key).remove(value);
     }
+
+    /**
+     * 根据key匹配模式获取所有符合规则的key
+     * @param pattern key匹配模式
+     * @return
+     */
+    public Set<String> getPatternKey(String pattern) {
+        Set<String> keys = stringRedisTemplate.keys(pattern);
+        if (Objects.isNull(keys)) {
+            return null;
+        }
+        if (keys.size() == 0) {
+            return null;
+        }
+        return keys;
+    }
 }

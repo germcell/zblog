@@ -265,7 +265,10 @@ public class BlogServiceImpl implements BlogService {
             // 2.4 查询版权信息
             Copyright copyright = copyrightMapper.getCopyRightByCrTipId(blog.getCrTipId());
             blogVO.setCopyright(copyright);
-            // 2.5 缓存到redis中
+            // 2.5 查询当前用户的热门文章概要信息5篇
+            List<BlogOutline> top5ByViews = blogOutlineMapper.topNArticlesViewedByUid(blog.getUid(), 5);
+            blogVO.setHotArticlesList(top5ByViews);
+            // 2.6 缓存到redis中
             articleRedisHelper.cacheArticle(ConstRedisKeyPrefix.ALL_ARTICLE_CACHE, String.valueOf(bid), blogVO);
             return new ResultVO(Const2.SERVICE_SUCCESS, "success", blogVO);
         } catch (Exception e) {

@@ -2,6 +2,7 @@ package com.zs.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.zs.config.Const;
+import com.zs.config.Const2;
 import com.zs.service.FansService;
 import com.zs.service.ViewsAndLikesService;
 import com.zs.vo.ResultVO;
@@ -33,16 +34,6 @@ public class ScheduledTask {
 
     @Resource
     private HashMap<String, List<String>> imageMap;
-
-    /**
-     * “0 0/5 14,18 * * ?” 每天的下午2点至2：55和6点至6点55分两个时间段内每5分钟一次触发
-     */
-    // @Scheduled(cron = "0 0/5 13,18 * * ?")
-
-    /**
-     * 每隔一小时执行一次
-     */
-    // @Scheduled(cron = "0 0 * * * ?")
 
     /**
      * 每隔10分钟执行一次，同步redis中存储的博客点击（浏览）量
@@ -97,18 +88,17 @@ public class ScheduledTask {
     }
 
     /**
-     * 同步redis中的关注信息到DB;每隔1天执行一次，同步redis中存储的博客点击（浏览）量
+     * 同步redis中的关注信息到DB,每隔1天执行一次
      */
-    // TODO 同步任务时间设置
-//    @Scheduled(cron = "0 0 0 ? * ?")
-//    @Scheduled(cron = "0 0/5 * * * ?")
-//    public void syncFansTask() throws JsonProcessingException {
-//        try {
-//            logger.info("开始同步redis中的关注信息到DB");
-//            ResultVO resultVO = fansService.syncFans();
-//            logger.info("同步完成，共涉及到 "+ resultVO.getData() +" 个用户");
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
+//    @Scheduled(cron = "0 0/1 * * * ?") 开发
+    @Scheduled(cron = "0 0 0 * * ?") // 线上
+    public void syncFansTask() {
+        logger.info("tb_fans数据表开始同步");
+        ResultVO resultVO = fansService.syncFans();
+        if (Objects.equals(resultVO.getCode(), Const2.SYNC_SUCCESS)) {
+            logger.info("tb_fans数据表同步完成，累计影响 "+ resultVO.getData() +" 个用户");
+        } else {
+            logger.info("tb_fans数据表同步完成，无影响用户");
+        }
+    }
 }

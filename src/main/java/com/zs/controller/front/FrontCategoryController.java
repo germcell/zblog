@@ -31,7 +31,7 @@ public class FrontCategoryController {
     }
 
     /**
-     * 获取所有文章发布形式
+     * 获取所有文章发布形式(版权)
      * @param token
      * @return
      */

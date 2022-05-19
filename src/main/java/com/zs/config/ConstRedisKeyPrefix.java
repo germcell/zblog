@@ -45,5 +45,14 @@ public class ConstRedisKeyPrefix {
      */
     public final static String WRITER_FANS_TO_REDIS = "allWriterFans_";
 
+    /**
+     * 文章分类信息缓存信息key
+     */
+    public static final String ALL_CATEGORIES = "allCategories";
+
+    /**
+     * 文章表达形式缓存信息key
+     */
+    public static final String ALL_COPYRIGHTS = "allCopyrights";
 
 }

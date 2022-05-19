@@ -74,4 +74,16 @@ public class Const2 {
      */
     public static final Integer CANCEL_LIKE_FAIL = 755;
 
+
+    /**
+     * 同步任务执行成功
+     */
+    public static final Integer SYNC_SUCCESS = 1000;
+
+    /**
+     * 同步任务执行成功,但无影响记录
+     */
+    public static final Integer SYNC_SUCCESS_NO_OPERATION = 1001;
+
+
 }

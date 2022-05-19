@@ -20,7 +20,7 @@ public interface BlogOutlineMapper {
     int insert(@Param("blogOutline") BlogOutline blogOutline);
 
     /**
-     * 浏览量降序查询
+     * 所有文章概要按浏览量降序查询
      * @return
      */
     List<BlogOutline> listSortByViewsBlogOutline();
@@ -74,4 +74,12 @@ public interface BlogOutlineMapper {
      * @return
      */
     BlogOutline getBlogOutlineByBid(@Param("bid") Long bid);
+
+    /**
+     * 以uid为查询条件，按浏览量降序排序
+     * @param uid 用户id
+     * @param n 需查询的条数
+     * @return
+     */
+    List<BlogOutline> topNArticlesViewedByUid(@Param("uid") Integer uid, @Param("n") Integer n);
 }

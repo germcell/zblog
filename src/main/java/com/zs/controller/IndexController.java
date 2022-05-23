@@ -60,14 +60,28 @@ public class IndexController {
      * 搜索接口
      * @param keyword 搜索关键字
      * @param p 页码
+     * @param searchType 搜索类别 ：null 表示文章， userInfo 表示搜索用户
      * @return code == 200 搜索成功，返回搜索分页对象
      *         code == 505 无搜索关键词
      */
     @GetMapping("/search/{keyword}")
-    public ResultVO search(@PathVariable("keyword") String keyword, @RequestParam("p") int p) {
+    public ResultVO search(@PathVariable("keyword") String keyword,
+                           @RequestParam("p") int p,
+                           @RequestParam(value = "t", required = false) String searchType) {
         if (Objects.equals(null, keyword) || !StringUtils.hasText(keyword)) {
             return new ResultVO(Const2.PARAMETERS_IS_NULL, "no input keyword", null);
         }
-        return blogService.search(keyword, p);
+        return blogService.search(keyword, p, searchType);
+
+//        if (Objects.isNull(searchType)) {
+//            return blogService.search(keyword, p);
+//        }
+//        if (Objects.equals("userInfo", searchType)) {
+//            // 查询用户
+//            return blogService.searchUser(keyword, p);
+//            return null;
+//        } else {
+//            return blogService.search(keyword, p);
+//        }
     }
 }

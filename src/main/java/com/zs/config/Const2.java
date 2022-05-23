@@ -89,4 +89,9 @@ public class Const2 {
      * elasticSearch文章信息索引名
      */
     public static final String ES_ARTICLE_INDEX = "zblogarticlesindex";
+
+    /**
+     * elasticSearch用户信息索引名
+     */
+    public static final String ES_USERINFO_INDEX = "zbloguserinfoindex";
 }

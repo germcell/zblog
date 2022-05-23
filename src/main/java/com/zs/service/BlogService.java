@@ -134,7 +134,8 @@ public interface BlogService {
      * 内容搜索
      * @param keyword 关键词
      * @param p 页码
+     * @param searchType 搜索类别， 为userInfo表示搜索用户，反之搜索文章
      * @return
      */
-    ResultVO search(String keyword, int p);
+    ResultVO search(String keyword, int p, String searchType);
 }

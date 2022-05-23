@@ -14,6 +14,7 @@ import com.zs.pojo.Category;
 import com.zs.pojo.Writer;
 import com.zs.vo.BlogES;
 import com.zs.vo.BlogOutlineVO;
+import com.zs.vo.MyPageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
@@ -90,13 +91,32 @@ class BlogApplicationTests {
 
     @Test
     void testCreateESIndex() throws IOException {
-        CreateIndexRequest indexRequest = new org.elasticsearch.client.indices.CreateIndexRequest("zblogarticlesindex");
+        // 创建文章信息索引
+//        CreateIndexRequest indexRequest = new org.elasticsearch.client.indices.CreateIndexRequest("zblogarticlesindex");
+        // 创建用户信息索引
+        CreateIndexRequest indexRequest = new org.elasticsearch.client.indices.CreateIndexRequest(Const2.ES_USERINFO_INDEX);
         CreateIndexResponse createIndexResponse = restHighLevelClient.indices().create(indexRequest, RequestOptions.DEFAULT);
         Assert.isTrue(createIndexResponse.isAcknowledged(), "创建文章索引失败");
     }
 
     @Test
     void testImportDataInDBToES() throws IOException {
+        // 1.查询数据库中的所有数据
+        List<BlogES> blogES = blogOutlineMapper.listESBlogs();
+        // 2.添加到es索引中
+        Iterator<BlogES> iterator = blogES.iterator();
+        while (iterator.hasNext()) {
+            BlogES next = iterator.next();
+            IndexRequest indexRequest = new IndexRequest(Const2.ES_ARTICLE_INDEX);
+            indexRequest.id(String.valueOf(next.getBid()));
+            indexRequest.source(objectMapper.writeValueAsString(next), XContentType.JSON);
+            IndexResponse index = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
+        }
+    }
+
+    // TODO
+    @Test
+    void testImportUserInfoDataInDBToES() throws IOException {
         // 1.查询数据库中的所有数据
         List<BlogES> blogES = blogOutlineMapper.listESBlogs();
         // 2.添加到es索引中
@@ -118,7 +138,9 @@ class BlogApplicationTests {
 
     @Test
     void testSearch() throws IOException, NoSuchFieldException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        List<BlogES> search = elasticSearchUtils.search(Const2.ES_ARTICLE_INDEX, "thymeleaf", 0, BlogES.class, "title", "outline");
-        search.stream().forEach(System.out::println);
+//        List<BlogES> search = elasticSearchUtils.search(Const2.ES_ARTICLE_INDEX, "thymeleaf", 0, BlogES.class, "title", "outline");
+//        search.stream().forEach(System.out::println);
+        MyPageInfo<BlogES> pageInfo = elasticSearchUtils.search(Const2.ES_ARTICLE_INDEX, "thymeleaf", 0, BlogES.class, "title", "outline");
+        System.out.println(pageInfo);
     }
 }

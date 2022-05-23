@@ -18,11 +18,15 @@ public class MyPageInfo<T> {
     /**
      * 总记录数
      */
-    private Integer total;
+    private Long total;
     /**
      * 开始索引
      */
     private Integer start;
+    /**
+     * 每页记录数
+     */
+    private Integer pageSize;
     /**
      * 总页数
      */

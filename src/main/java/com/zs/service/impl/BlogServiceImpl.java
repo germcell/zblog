@@ -536,20 +536,28 @@ public class BlogServiceImpl implements BlogService {
      * 内容搜索
      * @param keyword 关键词
      * @param p 页码
+     * @param searchType 搜索类别， 为userInfo表示搜索用户，反之搜索文章
      * @return
      */
     @Override
-    public ResultVO search(String keyword, int p) {
+    public ResultVO search(String keyword, int p, String searchType) {
         try {
             int start = (p - 1) * Const.CATEGORY_PAGE_ROWS;
-            List<BlogES> search = elasticSearchUtils.search(Const2.ES_ARTICLE_INDEX, keyword, start, BlogES.class, "title", "outline");
-            if (Objects.isNull(search)) {
-                return new ResultVO(Const2.SERVICE_SUCCESS, "no result", null);
+            // 如果搜素类别条件为null或不为 'userInfo'，则搜索文章信息
+            if (Objects.isNull(searchType) || !Objects.equals("userInfo", searchType)) {
+                MyPageInfo<BlogES> pageInfo = elasticSearchUtils.search(Const2.ES_ARTICLE_INDEX, keyword, start, BlogES.class, "title", "outline");
+                return new ResultVO(Const2.SERVICE_SUCCESS, "success", pageInfo);
             }
-            PageInfo<BlogES> pageInfo = new PageInfo<>(search);
-            // TODO 计算条数,el工具类返回一个自定义pageInfo对象
-
-            return new ResultVO(Const2.SERVICE_SUCCESS, "success", pageInfo);
+            // 如果搜索类别为 'userInfo'，则搜索用户信息
+            if (Objects.equals("userInfo", searchType)) {
+                /*
+                 *  TODO
+                 *    1.前端构造用户信息显示页面
+                 *    2.后端得到信息实体
+                 *    3.导入用户表数据到ES
+                 *    4.判断是否能复用ES查询工具
+                 */
+            }
         } catch (Exception e) {
             logger.info("搜索接口异常{}", e);
         }

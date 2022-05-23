@@ -38,6 +38,16 @@
         </association>
     </resultMap>
 
+    <resultMap id="ESBlogMap" type="com.zs.vo.BlogES">
+        <id column="did" property="bid"/>
+        <result column="title" property="title"/>
+        <result column="outline" property="outline"/>
+        <result column="first_picture" property="firstPicture"/>
+        <result column="write_time" property="writeTime"/>
+        <result column="like_num" property="likeNum"/>
+        <result column="views" property="views"/>
+    </resultMap>
+
     <insert id="insert">
         insert into tb_blog_outline
             (did, title, outline, views, uid, like_num, first_picture, write_time, is_publish)
@@ -68,6 +78,7 @@
             <if test="bo.outline != null and bo.outline != ''"> outline = #{bo.outline}, </if>
             <if test="bo.views != null"> views = #{bo.views}, </if>
             <if test="bo.isPublish != null"> is_publish = #{bo.isPublish}, </if>
+            <if test="bo.likeNum != null"> like_num = #{bo.likeNum}, </if>
         </trim>
         <where>
             <if test="bo.did != null"> and did = #{bo.did} </if>
@@ -79,6 +90,12 @@
                w.writer_name,w.writer_sex,w.writer_age,w.writer_birthday,w.mail,w.writer_status,w.writer_avatar
         from tb_blog_outline bo inner join tb_writer w on bo.uid = w.uid
         where bo.is_publish = 1 order by bo.write_time desc
+    </select>
+
+    <select id="listESBlogs" resultMap="ESBlogMap">
+        select did,title,outline,first_picture,write_time,like_num,views
+        from tb_blog_outline
+        where is_publish = 1
     </select>
 
     <select id="listBlogOutlinesByUid" resultMap="blogOutlineMap">

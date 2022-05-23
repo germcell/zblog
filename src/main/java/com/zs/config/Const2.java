@@ -85,5 +85,8 @@ public class Const2 {
      */
     public static final Integer SYNC_SUCCESS_NO_OPERATION = 1001;
 
-
+    /**
+     * elasticSearch文章信息索引名
+     */
+    public static final String ES_ARTICLE_INDEX = "zblogarticlesindex";
 }

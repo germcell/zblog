@@ -74,7 +74,7 @@ public class FansRedisHelper {
      * 取消关注
      * @param key allWriterFans_ + 取关发起人id （key）
      * @param value 被取关人id
-     * return 1 成功 0 失败
+     * @return 1 成功 0 失败
      */
     public Long unfollow(String key, String value) {
         return stringRedisTemplate.boundSetOps(key).remove(value);
@@ -83,7 +83,7 @@ public class FansRedisHelper {
     /**
      * 根据key匹配模式获取所有符合规则的key
      * @param pattern key匹配模式
-     * @return
+     * @return null 无匹配key
      */
     public Set<String> getPatternKey(String pattern) {
         Set<String> keys = stringRedisTemplate.keys(pattern);

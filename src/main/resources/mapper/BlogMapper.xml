@@ -213,6 +213,7 @@
             <if test="blog.crTipId != null">  cr_tip_id = #{blog.crTipId}, </if>
             <if test="blog.firstPicture != '' and blog.firstPicture != null">  first_picture = #{blog.firstPicture}, </if>
             <if test="blog.views != null">  views = #{blog.views}, </if>
+            <if test="blog.likeNum != null">  like_num = #{blog.likeNum}, </if>
         </trim>
     where bid = #{bid}
     </update>

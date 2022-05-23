@@ -9,7 +9,9 @@ import com.zs.handler.*;
 import com.zs.mapper.*;
 import com.zs.pojo.*;
 import com.zs.service.BlogService;
+import com.zs.vo.BlogES;
 import com.zs.vo.BlogVO;
+import com.zs.vo.MyPageInfo;
 import com.zs.vo.ResultVO;
 import org.aspectj.weaver.ast.Var;
 import org.slf4j.Logger;
@@ -49,6 +51,8 @@ public class BlogServiceImpl implements BlogService {
     private ThumbsRedisHelper thumbsRedisHelper;
     @Resource
     private CopyrightMapper copyrightMapper;
+    @Resource
+    private ElasticSearchUtils elasticSearchUtils;
 
     @Override
     public PageInfo<Blog> listPageBlogs(Integer currentPage, Integer rows) {
@@ -526,5 +530,29 @@ public class BlogServiceImpl implements BlogService {
             return new ResultVO(Const2.SERVICE_SUCCESS, "success", null);
         }
         return new ResultVO(Const2.SERVICE_FAIL, "fail", null);
+    }
+
+    /**
+     * 内容搜索
+     * @param keyword 关键词
+     * @param p 页码
+     * @return
+     */
+    @Override
+    public ResultVO search(String keyword, int p) {
+        try {
+            int start = (p - 1) * Const.CATEGORY_PAGE_ROWS;
+            List<BlogES> search = elasticSearchUtils.search(Const2.ES_ARTICLE_INDEX, keyword, start, BlogES.class, "title", "outline");
+            if (Objects.isNull(search)) {
+                return new ResultVO(Const2.SERVICE_SUCCESS, "no result", null);
+            }
+            PageInfo<BlogES> pageInfo = new PageInfo<>(search);
+            // TODO 计算条数,el工具类返回一个自定义pageInfo对象
+
+            return new ResultVO(Const2.SERVICE_SUCCESS, "success", pageInfo);
+        } catch (Exception e) {
+            logger.info("搜索接口异常{}", e);
+        }
+        return new ResultVO(Const2.SERVICE_FAIL, "exception", null);
     }
 }

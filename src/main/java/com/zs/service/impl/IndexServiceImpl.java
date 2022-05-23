@@ -89,7 +89,7 @@ public class IndexServiceImpl implements IndexService {
             List<BlogOutline> viewSort = blogOutlineMapper.listSortByViewsBlogOutline();
             PageInfo<BlogOutline> viewSortPageInfo = new PageInfo<>(viewSort);
             map.put("hotArticle", viewSortPageInfo);
-            // 5.封装返回数据
+            // 5.封装并缓存响应数据
             articleRedisHelper.cacheIndexPageData(ConstRedisKeyPrefix.INDEX_PAGE_DATA, map);
             ResultVO resultVO = new ResultVO(Const2.SERVICE_SUCCESS, "success", map);
             return resultVO;

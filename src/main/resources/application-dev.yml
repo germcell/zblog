@@ -41,6 +41,10 @@ spring:
     servlet:
       content-type: text/html
 
+  # elasticSearch
+  elasticsearch:
+    uris: http://43.138.135.209:9200
+
 # mybaits包扫描、别名
 mybatis:
   mapper-locations: classpath:mapper/*.xml

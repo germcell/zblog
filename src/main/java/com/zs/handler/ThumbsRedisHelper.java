@@ -1,35 +1,24 @@
 package com.zs.handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zs.dto.ThumbsDTO;
-import com.zs.pojo.Fans;
-import com.zs.pojo.Like;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Objects;
 
 /**
  * redis点赞帮助类
+ *  用于缓存文章点赞记录，规则：
+ *  1.进入文章详情页时，先获取文章的点赞数量，并以键前缀为 articleAllLikes_ 缓存（string）。
+ *  2.用户触发新的点赞，则创建键前缀为 articleNewLikes_ 的记录（set），并将总数+1.
+ *  3.用户触发取消点赞，则在对应的记录上删除，并将总数-1。
+ *  4.以一天为一个周期，同步点赞总数到数据库中对应的文章。
+ *  5.可选择定期（3天）清除 articleNewLikes_ 数据来减少内存占用，但不能保证用户只能为文章点赞一次。
  * @Created by zs on 2022/5/12.
  */
 @Component("thumbsRedisHelper")
 public class ThumbsRedisHelper {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ThumbsRedisHelper.class);
-
-    @Resource
-    private ObjectMapper om;
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
@@ -80,7 +69,8 @@ public class ThumbsRedisHelper {
     /**
      * 获取文章点赞数
      * @param key
-     * @return
+     * @return null key不存在
+     *         Long 文章点赞数量
      */
     public Long getArticleLikeNum(String key) {
         String s = stringRedisTemplate.boundValueOps(key).get();
@@ -99,6 +89,10 @@ public class ThumbsRedisHelper {
      * @return 自减后的文章点赞数量
      */
     public Long decrLikeNum(String key) {
+        Long articleLikeNum = getArticleLikeNum(key);
+        if (articleLikeNum == 0) {
+            return null;
+        }
         return stringRedisTemplate.boundValueOps(key).decrement();
     }
 

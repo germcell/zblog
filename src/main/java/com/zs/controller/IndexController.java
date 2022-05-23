@@ -1,12 +1,15 @@
 package com.zs.controller;
 
+import com.zs.config.Const2;
 import com.zs.service.BlogOutlineService;
 import com.zs.service.BlogService;
 import com.zs.service.IndexService;
 import com.zs.vo.ResultVO;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Objects;
 
 /**
  * 首页控制器
@@ -53,4 +56,18 @@ public class IndexController {
         return blogService.getBlogByIdAndConvert(bid);
     }
 
+    /**
+     * 搜索接口
+     * @param keyword 搜索关键字
+     * @param p 页码
+     * @return code == 200 搜索成功，返回搜索分页对象
+     *         code == 505 无搜索关键词
+     */
+    @GetMapping("/search/{keyword}")
+    public ResultVO search(@PathVariable("keyword") String keyword, @RequestParam("p") int p) {
+        if (Objects.equals(null, keyword) || !StringUtils.hasText(keyword)) {
+            return new ResultVO(Const2.PARAMETERS_IS_NULL, "no input keyword", null);
+        }
+        return blogService.search(keyword, p);
+    }
 }

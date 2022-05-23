@@ -129,4 +129,12 @@ public interface BlogService {
      * @return
      */
     ResultVO updateBlog2(Blog blog, MultipartFile file);
+
+    /**
+     * 内容搜索
+     * @param keyword 关键词
+     * @param p 页码
+     * @return
+     */
+    ResultVO search(String keyword, int p);
 }

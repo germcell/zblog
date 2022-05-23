@@ -1,6 +1,7 @@
 package com.zs.mapper;
 
 import com.zs.pojo.BlogOutline;
+import com.zs.vo.BlogES;
 import com.zs.vo.BlogOutlineVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -51,6 +52,12 @@ public interface BlogOutlineMapper {
      * @return
      */
     List<BlogOutlineVO> listBlogOutlines() throws Exception;
+
+    /**
+     * 查询所有文章，封装为ES实体
+     * @return
+     */
+    List<BlogES> listESBlogs();
 
     /**
      * 查询指定作者的文章概要信息，（指定查询已发布、草稿状态）

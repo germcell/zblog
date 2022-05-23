@@ -37,4 +37,10 @@ public interface ThumbsService {
      * @return
      */
     ResultVO cancelLike(ThumbsDTO thumbsDTO);
+
+    /**
+     * 同步点赞数量
+     * @return
+     */
+    ResultVO syncLike();
 }

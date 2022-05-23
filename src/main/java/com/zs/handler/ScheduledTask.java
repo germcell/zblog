@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.zs.config.Const;
 import com.zs.config.Const2;
 import com.zs.service.FansService;
+import com.zs.service.ThumbsService;
 import com.zs.service.ViewsAndLikesService;
+import com.zs.service.impl.ThumbsServiceImpl;
 import com.zs.vo.ResultVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,9 @@ public class ScheduledTask {
 
     @Resource
     private FansService fansService;
+
+    @Resource
+    private ThumbsService thumbsService;
 
     @Resource
     private ViewsAndLikesService viewsAndLikesService;
@@ -88,9 +93,8 @@ public class ScheduledTask {
     }
 
     /**
-     * 同步redis中的关注信息到DB,每隔1天执行一次
+     * 同步redis中的关注信息到DB,周期为1天
      */
-//    @Scheduled(cron = "0 0/1 * * * ?") 开发
     @Scheduled(cron = "0 0 0 * * ?") // 线上
     public void syncFansTask() {
         logger.info("tb_fans数据表开始同步");
@@ -99,6 +103,21 @@ public class ScheduledTask {
             logger.info("tb_fans数据表同步完成，累计影响 "+ resultVO.getData() +" 个用户");
         } else {
             logger.info("tb_fans数据表同步完成，无影响用户");
+        }
+    }
+
+    /**
+     * 同步文章的点赞数量，周期为12h
+     */
+//    @Scheduled(cron = "0 0/1 * * * ?")
+    @Scheduled(cron = "0 0 0/12 * * ?")
+    public void syncLikeTask() {
+        logger.info("tb_blog、tb_blog_outline数据表开始同步");
+        ResultVO resultVO = thumbsService.syncLike();
+        if (Objects.equals(resultVO.getCode(), Const2.SYNC_SUCCESS)) {
+            logger.info("tb_blog、tb_blog_outline数据表同步完成，累计影响 " + resultVO.getData() + " 条记录");
+        } else {
+            logger.info("tb_blog、tb_blog_outline数据表同步完成，无影响记录");
         }
     }
 }

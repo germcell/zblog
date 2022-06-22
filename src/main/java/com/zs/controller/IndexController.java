@@ -1,10 +1,13 @@
 package com.zs.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.zs.config.Const2;
 import com.zs.service.BlogOutlineService;
 import com.zs.service.BlogService;
 import com.zs.service.IndexService;
 import com.zs.vo.ResultVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +22,8 @@ import java.util.Objects;
 @CrossOrigin
 @RequestMapping("/v2/index")
 public class IndexController {
+
+    private final Logger LOGGER = LoggerFactory.getLogger(IndexController.class);
 
     @Resource
     private IndexService indexService;
@@ -72,16 +77,19 @@ public class IndexController {
             return new ResultVO(Const2.PARAMETERS_IS_NULL, "no input keyword", null);
         }
         return blogService.search(keyword, p, searchType);
+    }
 
-//        if (Objects.isNull(searchType)) {
-//            return blogService.search(keyword, p);
-//        }
-//        if (Objects.equals("userInfo", searchType)) {
-//            // 查询用户
-//            return blogService.searchUser(keyword, p);
-//            return null;
-//        } else {
-//            return blogService.search(keyword, p);
-//        }
+    /**
+     * 获取文章排行榜
+     * @return
+     */
+    @GetMapping("/article/rank")
+    public ResultVO getArticleRank() {
+        try {
+            return indexService.getArticleRank();
+        } catch (JsonProcessingException e) {
+            LOGGER.info("获取排行榜异常{}",e);
+        }
+       return new ResultVO(Const2.SERVICE_FAIL, "exception", null);
     }
 }

@@ -141,7 +141,6 @@ public class ElasticSearchUtils {
 //        // 返回
 //        return list;
 //    }
-
     
     public <T> MyPageInfo<T> search(String index, String keyword, int start, Class<T> t, String... fieldName) throws IOException, NoSuchFieldException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         SearchRequest searchRequest = new SearchRequest(index);
@@ -204,6 +203,33 @@ public class ElasticSearchUtils {
         pageInfo.setList(list);
         // 返回
         return pageInfo;
+    }
+
+    /**
+     * 查询指定索引中所有记录
+     * @param index
+     * @param t
+     * @param <T>
+     * @return
+     */
+    public <T> List<T> searchAll(String index, Class<T> t) throws IOException {
+        List<T> list = new LinkedList<>();
+        SearchRequest searchRequest = new SearchRequest(index);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+        searchRequest.source(searchSourceBuilder);
+        SearchResponse search = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
+        SearchHits hits = search.getHits();
+        if (hits.getTotalHits().value == 0) {
+            return list;
+        }
+        Iterator<SearchHit> iterator = hits.iterator();
+        while (iterator.hasNext()) {
+            SearchHit next = iterator.next();
+            String sourceAsString = next.getSourceAsString();
+            list.add(objectMapper.readValue(sourceAsString, t));
+        }
+        return list;
     }
 
 }

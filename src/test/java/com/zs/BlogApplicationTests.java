@@ -6,16 +6,19 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zs.config.Const;
 import com.zs.config.Const2;
+import com.zs.config.ConstRedisKeyPrefix;
+import com.zs.handler.ArticleRankRedisHelper;
+import com.zs.handler.ArticleRedisHelper;
 import com.zs.handler.ElasticSearchUtils;
 import com.zs.mapper.BlogOutlineMapper;
 import com.zs.mapper.CategoryMapper;
 import com.zs.mapper.WriterMapper;
 import com.zs.pojo.Category;
 import com.zs.pojo.Writer;
-import com.zs.vo.BlogES;
-import com.zs.vo.BlogOutlineVO;
-import com.zs.vo.MyPageInfo;
+import com.zs.service.BlogService;
+import com.zs.vo.*;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -56,6 +59,10 @@ class BlogApplicationTests {
     private ObjectMapper objectMapper;
     @Resource
     private ElasticSearchUtils elasticSearchUtils;
+    @Resource
+    private ArticleRankRedisHelper articleRankRedisHelper;
+    @Resource
+    private BlogService blogService;
 
     @Test
     void contextLoads() {
@@ -100,23 +107,13 @@ class BlogApplicationTests {
     }
 
     @Test
-    void testImportDataInDBToES() throws IOException {
-        // 1.查询数据库中的所有数据
-        List<BlogES> blogES = blogOutlineMapper.listESBlogs();
-        // 2.添加到es索引中
-        Iterator<BlogES> iterator = blogES.iterator();
-        while (iterator.hasNext()) {
-            BlogES next = iterator.next();
-            IndexRequest indexRequest = new IndexRequest(Const2.ES_ARTICLE_INDEX);
-            indexRequest.id(String.valueOf(next.getBid()));
-            indexRequest.source(objectMapper.writeValueAsString(next), XContentType.JSON);
-            IndexResponse index = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
-        }
+    void testDeleteIndex() throws IOException {
+        DeleteRequest deleteRequest = new DeleteRequest(Const2.ES_USERINFO_INDEX);
+        restHighLevelClient.delete(deleteRequest, RequestOptions.DEFAULT);
     }
 
-    // TODO
     @Test
-    void testImportUserInfoDataInDBToES() throws IOException {
+    void testImportDataInDBToES() throws IOException {
         // 1.查询数据库中的所有数据
         List<BlogES> blogES = blogOutlineMapper.listESBlogs();
         // 2.添加到es索引中
@@ -143,4 +140,52 @@ class BlogApplicationTests {
         MyPageInfo<BlogES> pageInfo = elasticSearchUtils.search(Const2.ES_ARTICLE_INDEX, "thymeleaf", 0, BlogES.class, "title", "outline");
         System.out.println(pageInfo);
     }
+
+    @Test
+    void testImportRankDataToRedis() throws IOException {
+        List<BlogES> blogs = elasticSearchUtils.searchAll(Const2.ES_ARTICLE_INDEX, BlogES.class);
+        Iterator<BlogES> iterator = blogs.iterator();
+        while (iterator.hasNext()) {
+            BlogES next = iterator.next();
+            double score = next.getViews() + next.getLikeNum();
+            next.setOutline(null);
+            articleRankRedisHelper.addToRank(ConstRedisKeyPrefix.ARTICLE_RANK, next, score);
+        }
+    }
+
+    @Test
+    void testZrevrange() throws JsonProcessingException {
+        articleRankRedisHelper.getRankTopN(ConstRedisKeyPrefix.ARTICLE_RANK, 0 , 3);
+    }
+
+    @Test
+    void testImportWriterDataToES() throws Exception {
+        WriterES writerES = new WriterES();
+        List<Writer> writers = writerMapper.listWriterByCondition(new Writer());
+        writers.stream().forEach(w -> {
+            writerES.setUid(w.getUid());
+            writerES.setWriterName(w.getWriterName());
+            writerES.setWriterAvatar(w.getWriterAvatar());
+            writerES.setFans(w.getFans());
+            writerES.setArticleNum(w.getArticleNum());
+            writerES.setAllViews(w.getAllViews());
+            writerES.setAllLikeNums(w.getAllLikeNums());
+            try {
+                IndexRequest indexRequest = new IndexRequest(Const2.ES_USERINFO_INDEX);
+                indexRequest.id(String.valueOf(writerES.getUid()));
+                indexRequest.source(objectMapper.writeValueAsString(writerES), XContentType.JSON);
+                restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    @Test
+    void testSearchWriterInES() {
+//        ResultVO search = blogService.search("花", 1, "userInfo");
+        ResultVO search = blogService.search("mybatis", 1, null);
+        System.out.println(search);
+    }
+
 }

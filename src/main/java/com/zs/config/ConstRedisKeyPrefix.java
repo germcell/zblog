@@ -46,4 +46,9 @@ public class ConstRedisKeyPrefix {
      */
     public static final String ALL_COPYRIGHTS = "allCopyrights";
 
+    /**
+     * 文章排行榜key
+     */
+    public static final String ARTICLE_RANK = "articleRank";
+
 }

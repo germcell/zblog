@@ -1,5 +1,6 @@
 package com.zs.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.zs.vo.ResultVO;
 
 /**
@@ -11,4 +12,10 @@ public interface IndexService {
      * @return
      */
     ResultVO getIndexData();
+
+    /**
+     * 获取文章排行榜
+     * @return
+     */
+    ResultVO getArticleRank() throws JsonProcessingException;
 }

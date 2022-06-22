@@ -1,10 +1,12 @@
 package com.zs.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zs.config.Const;
 import com.zs.config.Const2;
 import com.zs.config.ConstRedisKeyPrefix;
+import com.zs.handler.ArticleRankRedisHelper;
 import com.zs.handler.ArticleRedisHelper;
 import com.zs.handler.RandomUtils;
 import com.zs.mapper.AdMapper;
@@ -13,17 +15,19 @@ import com.zs.mapper.WriterMapper;
 import com.zs.pojo.Ad;
 import com.zs.pojo.BlogOutline;
 import com.zs.pojo.Writer;
-import com.zs.service.BlogOutlineService;
 import com.zs.service.IndexService;
+import com.zs.vo.BlogES;
 import com.zs.vo.BlogOutlineVO;
 import com.zs.vo.ResultVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Created by zs on 2022/4/20.
@@ -39,6 +43,8 @@ public class IndexServiceImpl implements IndexService {
     private WriterMapper writerMapper;
     @Resource
     private ArticleRedisHelper articleRedisHelper;
+    @Resource
+    private ArticleRankRedisHelper articleRankRedisHelper;
 
     private Logger logger = LoggerFactory.getLogger(IndexServiceImpl.class);
 
@@ -55,11 +61,13 @@ public class IndexServiceImpl implements IndexService {
                 return new ResultVO(Const2.SERVICE_SUCCESS, "success", indexPageData);
             }
             HashMap<String,Object> map = new HashMap<>();
+
             // 1.查询第一页的文章概要信息，已按发布时间降序排列
             PageHelper.startPage(1, Const.BLOG_PAGE_ROWS);
             List<BlogOutlineVO> blogOutlineVOS = blogOutlineMapper.listBlogOutlines();
             PageInfo<BlogOutlineVO> blogOutlineVOPageInfo = new PageInfo<>(blogOutlineVOS);
             map.put("blogPageInfo", blogOutlineVOPageInfo);
+
             // 2.查询首页活动
             Ad ad = adMapper.getAdByStatus(1);
             if (ad.getType() == 2) {
@@ -74,6 +82,7 @@ public class IndexServiceImpl implements IndexService {
             } else {
                 map.put("ad", ad);
             }
+
             // 3.查询5名作者信息，策略：已文章发表数量及作者状态为1（正常）
             Writer condition = new Writer();
             condition.setWriterStatus(1);
@@ -83,12 +92,11 @@ public class IndexServiceImpl implements IndexService {
             writers.stream().forEach(w -> {w.setPwd(null);});
             PageInfo<Writer> writerPageInfo = new PageInfo<>(writers);
             map.put("writers", writerPageInfo.getList());
-            // 4.查询浏览量前15的文章概要信息(排行榜)
-            // TODO redis实现
-            PageHelper.startPage(1, 15);
-            List<BlogOutline> viewSort = blogOutlineMapper.listSortByViewsBlogOutline();
-            PageInfo<BlogOutline> viewSortPageInfo = new PageInfo<>(viewSort);
-            map.put("hotArticle", viewSortPageInfo);
+
+            // 4.查询浏览量前30的文章概要信息(缓存排行榜)
+            PageInfo<BlogES> rankTopN = new PageInfo<>((List) this.getArticleRank().getData());
+            map.put("hotArticle", rankTopN);
+
             // 5.封装并缓存响应数据
             articleRedisHelper.cacheIndexPageData(ConstRedisKeyPrefix.INDEX_PAGE_DATA, map);
             ResultVO resultVO = new ResultVO(Const2.SERVICE_SUCCESS, "success", map);
@@ -98,5 +106,15 @@ public class IndexServiceImpl implements IndexService {
             ResultVO resultVO = new ResultVO(Const2.SERVICE_FAIL, "fail", null);
             return resultVO;
         }
+    }
+
+    /**
+     * 获取文章排行榜
+     * @return
+     */
+    @Override
+    public ResultVO getArticleRank() throws JsonProcessingException {
+        List<BlogES> rankTopN = articleRankRedisHelper.getRankTopN(ConstRedisKeyPrefix.ARTICLE_RANK, 0, 29);
+        return new ResultVO(Const2.SERVICE_SUCCESS, "success", rankTopN);
     }
 }

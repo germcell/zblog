@@ -9,10 +9,7 @@ import com.zs.handler.*;
 import com.zs.mapper.*;
 import com.zs.pojo.*;
 import com.zs.service.BlogService;
-import com.zs.vo.BlogES;
-import com.zs.vo.BlogVO;
-import com.zs.vo.MyPageInfo;
-import com.zs.vo.ResultVO;
+import com.zs.vo.*;
 import org.aspectj.weaver.ast.Var;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -543,20 +540,18 @@ public class BlogServiceImpl implements BlogService {
     public ResultVO search(String keyword, int p, String searchType) {
         try {
             int start = (p - 1) * Const.CATEGORY_PAGE_ROWS;
-            // 如果搜素类别条件为null或不为 'userInfo'，则搜索文章信息
+            // 如果搜索类别条件为null或不为 'userInfo'，则搜索文章信息
             if (Objects.isNull(searchType) || !Objects.equals("userInfo", searchType)) {
-                MyPageInfo<BlogES> pageInfo = elasticSearchUtils.search(Const2.ES_ARTICLE_INDEX, keyword, start, BlogES.class, "title", "outline");
-                return new ResultVO(Const2.SERVICE_SUCCESS, "success", pageInfo);
+                MyPageInfo<BlogES> articlePageInfo = elasticSearchUtils.search(Const2.ES_ARTICLE_INDEX, keyword, start, BlogES.class, "title", "outline");
+                return new ResultVO(Const2.SERVICE_SUCCESS, "success", articlePageInfo);
             }
             // 如果搜索类别为 'userInfo'，则搜索用户信息
             if (Objects.equals("userInfo", searchType)) {
                 /*
-                 *  TODO
-                 *    1.前端构造用户信息显示页面
-                 *    2.后端得到信息实体
-                 *    3.导入用户表数据到ES
-                 *    4.判断是否能复用ES查询工具
+                 *  TODO 前端展示数据
                  */
+                MyPageInfo<WriterES> writerPageInfo = elasticSearchUtils.search(Const2.ES_USERINFO_INDEX, keyword, start, WriterES.class, "writerName");
+                return new ResultVO(Const2.SERVICE_SUCCESS, "success", writerPageInfo);
             }
         } catch (Exception e) {
             logger.info("搜索接口异常{}", e);

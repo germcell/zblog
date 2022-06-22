@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zs.mapper.OrderMapper">
+    <insert id="insert">
+        INSERT INTO tb_order
+        (
+        oid,
+        order_no,
+        money,
+        subject,
+        uid,
+        uid2,
+        status,
+        comment,
+        create_time
+        )
+        VALUES
+        (
+        null,
+        #{order.orderNo},
+        #{order.money},
+        #{order.subject},
+        #{order.uid},
+        #{order.uid2},
+        #{order.status},
+        #{order.comment},
+        #{order.createTime}
+       )
+    </insert>
+
+    <update id="update">
+        UPDATE tb_order
+        SET `status`=#{order.status},alipay_trade_no=#{order.alipayTradeNo},pay_time=#{order.payTime}
+        WHERE order_no=#{order.orderNo}
+    </update>
+</mapper>

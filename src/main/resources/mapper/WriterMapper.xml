@@ -34,6 +34,7 @@
             <if test="writer.mail != null">and mail=#{writer.mail}</if>
             <if test="writer.writerStatus != null">and writer_status=#{writer.writerStatus}</if>
             <if test="writer.articleNum != null">and article_num>#{writer.articleNum}</if>
+            and writer_status = 1
         </where>
     </select>
 

@@ -76,4 +76,18 @@ public class ArticleRedisHelper {
         return map;
     }
 
+    /**
+     * 更新首页的缓存数据；比如用户更改文章状态后，那么将会更新首页缓存中的文章数据部分
+     * 先查询缓存后，替换新的值，重新写入缓存
+     *
+     * @param redisKey 首页缓存数据的键
+     * @param key 因为string序列化后是一个map集合，所以此处为key
+     * @param value 值
+     */
+    public void updateIndexPageCacheData(String redisKey, String key, Object value) throws JsonProcessingException {
+        HashMap<String, Object> indexPageData = this.getIndexPageData(redisKey);
+        indexPageData.put(key, value);
+        this.cacheIndexPageData(redisKey, indexPageData);
+    }
+
 }

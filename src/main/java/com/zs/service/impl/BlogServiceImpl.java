@@ -9,16 +9,19 @@ import com.zs.handler.*;
 import com.zs.mapper.*;
 import com.zs.pojo.*;
 import com.zs.service.BlogService;
+import com.zs.service.IndexService;
 import com.zs.vo.*;
 import org.aspectj.weaver.ast.Var;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.swing.text.View;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
@@ -45,11 +48,15 @@ public class BlogServiceImpl implements BlogService {
     @Resource
     private ArticleRedisHelper articleRedisHelper;
     @Resource
+    private ArticleRankRedisHelper articleRankRedisHelper;
+    @Resource
     private ThumbsRedisHelper thumbsRedisHelper;
     @Resource
     private CopyrightMapper copyrightMapper;
     @Resource
     private ElasticSearchUtils elasticSearchUtils;
+    @Resource
+    private IndexService indexService;
 
     @Override
     public PageInfo<Blog> listPageBlogs(Integer currentPage, Integer rows) {
@@ -231,14 +238,30 @@ public class BlogServiceImpl implements BlogService {
                 if (articleLikeNum != null) {
                     blogVOByBidToRedis.getBlog().setLikeNum(articleLikeNum);
                 }
+
+                // 如果是从redis中查询的文章信息，那么就在累加redis中文章的浏览量
+                // 获取redis中key为articleRank的数据，遍历得到对应记录，最后进行score++，表示累加浏览量
+                articleRankRedisHelper.accumulateArticleViews(ConstRedisKeyPrefix.ARTICLE_RANK, bid);
+
+                // 更新首页缓存排行榜部分
+                PageInfo<BlogES> rankTopN = new PageInfo<>((List) indexService.getArticleRank().getData());
+                articleRedisHelper.updateIndexPageCacheData(ConstRedisKeyPrefix.INDEX_PAGE_DATA, "hotArticle", rankTopN);
+
                 return new ResultVO(Const2.SERVICE_SUCCESS, "success", blogVOByBidToRedis);
             }
+
+
             // 2.1 查询文章信息
             BlogVO blogVO = new BlogVO();
             Blog blog =  blogMapper.getBlogByBid(bid);
             if (blog == null) {
                 return new ResultVO(Const2.SERVICE_FAIL, "article not found", null);
             }
+
+            // 如果是从数据库中查询的文章信息，那么先累加浏览量，然后再缓存到redis中
+            blog.setViews(blog.getViews()+1);
+
+            // markdown解析为html
             String htmlData = MarkdownUtils.markdownToHtmlExtensions(blog.getContent());
             blog.setContent(htmlData);
             blogVO.setBlog(blog);
@@ -274,7 +297,6 @@ public class BlogServiceImpl implements BlogService {
             return new ResultVO(Const2.SERVICE_SUCCESS, "success", blogVO);
         } catch (Exception e) {
             logger.info("查询文章信息异常");
-            e.printStackTrace();
             return new ResultVO(Const2.SERVICE_FAIL, "exception", null);
         }
     }
@@ -361,7 +383,7 @@ public class BlogServiceImpl implements BlogService {
     }
 
     /**
-     * 更新文章状态
+     * 更新文章状态,还会更新用户的文章发表数
      * @param uid 用户id
      * @param bid 文章id
      * @param status 状态 1：发布 0：草稿
@@ -386,10 +408,12 @@ public class BlogServiceImpl implements BlogService {
                 blogOutline.setIsPublish(isPublish);
                 blogOutline.setDid(Long.parseLong(bid));
                 int r1 = blogOutlineMapper.updateByCondition(blogOutline);
+
                 Blog blog = new Blog();
                 blog.setBid(Long.parseLong(bid));
                 blog.setIsPublish(isPublish);
                 int r2 = blogMapper.updateBlogById(blog, blog.getBid());
+
                 if (r1 == 1 && r2 == 1) {
                     Writer condition = new Writer();
                     condition.setUid(Integer.parseInt(uid));
@@ -403,13 +427,19 @@ public class BlogServiceImpl implements BlogService {
                             writer.setArticleNum(writers.get(0).getArticleNum() - 1);
                         }
                         writerMapper.updateWriterByUid(writer);
+
+                        // 修改文章状态后，需更新首页缓存中的文章部分
+                        PageHelper.startPage(1, Const.BLOG_PAGE_ROWS);
+                        List<BlogOutlineVO> blogOutlineVOS = blogOutlineMapper.listBlogOutlines();
+                        PageInfo<BlogOutlineVO> blogOutlineVOPageInfo = new PageInfo<>(blogOutlineVOS);
+                        articleRedisHelper.updateIndexPageCacheData(ConstRedisKeyPrefix.INDEX_PAGE_DATA, "blogPageInfo", blogOutlineVOPageInfo);
+
                         return new ResultVO(Const2.SERVICE_SUCCESS, "success", null);
                     }
                 }
                 return new ResultVO(Const2.NOT_FOUND,  "parameter not found", null);
             } catch(Exception e) {
-                e.printStackTrace();
-                logger.info("更新文章状态接口异常");
+                logger.info("更新文章状态接口异常:{}", e);
                 return new ResultVO(Const2.SERVICE_FAIL, "request params " + bid + " fail", null);
             }
         }

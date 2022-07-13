@@ -93,7 +93,7 @@ public class IndexServiceImpl implements IndexService {
             PageInfo<Writer> writerPageInfo = new PageInfo<>(writers);
             map.put("writers", writerPageInfo.getList());
 
-            // 4.查询浏览量前30的文章概要信息(缓存排行榜)
+            // 4.查询浏览量前30的文章概要信息(redis中的缓存排行榜)
             PageInfo<BlogES> rankTopN = new PageInfo<>((List) this.getArticleRank().getData());
             map.put("hotArticle", rankTopN);
 

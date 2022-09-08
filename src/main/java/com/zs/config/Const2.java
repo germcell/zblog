@@ -95,5 +95,9 @@ public class Const2 {
      */
     public static final String ES_USERINFO_INDEX = "zbloguserinfoindex";
 
+    /**
+     * 队列名称1
+     */
+    public static final String MSG_QUEUE_1 = "MsgQueue1";
 
 }

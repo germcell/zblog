@@ -37,7 +37,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/v2/lr/access/**")
                 .excludePathPatterns("/v2/thumbs-up/get/*")
                 .excludePathPatterns("/v2/my-alipay/pay")
-                .excludePathPatterns("/v2/my-alipay/pay-notify");
+                .excludePathPatterns("/v2/my-alipay/pay-notify")
+                .excludePathPatterns("/v2/msg/**");
     }
 
     /* 实时显示上传后的文件，而不需重启服务器 */

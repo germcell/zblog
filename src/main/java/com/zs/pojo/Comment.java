@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * 评论实体类
+ * 评论实体类 <弃用>
  * @Created by zs on 2022/2/22.
  */
 @Data

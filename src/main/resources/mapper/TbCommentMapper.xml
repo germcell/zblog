@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.zs.mapper.TbCommentMapper">
+
+    <resultMap id="commentVO" type="com.zs.vo.CommentVO">
+        <id column="id" property="id"/>
+        <result column="send_id" property="sendId"/>
+        <result column="receive_id" property="receiveId"/>
+        <result column="msg_tag" property="msgTag"/>
+        <result column="writer_name" property="name"/>
+        <result column="writer_sex" property="sex"/>
+        <result column="writer_avatar" property="avatar"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <resultMap id="unreadNumVO" type="com.zs.vo.CommentVO">
+        <result column="send_id" property="sendId"/>
+        <result column="unread" property="unread"/>
+    </resultMap>
+
+    <select id="getByReceiveId" parameterType="long" resultMap="commentVO">
+        select c.id,c.send_id,c.receive_id,c.msg_tag,c.create_time,w.writer_name,w.writer_sex,w.writer_avatar
+        from tb_comment c,tb_writer w
+        where c.receive_id = #{receiveId} and c.msg_tag = 0 and c.send_id = w.uid
+        order by c.create_time desc
+    </select>
+
+    <select id="getUnreadByReceiveId" parameterType="long" resultMap="unreadNumVO">
+        select c.send_id,count(*) unread
+        from tb_comment c
+        where c.receive_id = #{receiveId} and c.is_read = 0
+        group by c.send_id
+    </select>
+</mapper>

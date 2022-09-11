@@ -1,5 +1,6 @@
 package com.zs.vo;
 
+import com.zs.config.Const2;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,5 +18,13 @@ public class ResultVO {
     private Integer code;
     private String message;
     private Object data;
+
+    public static ResultVO success(Object data) {
+        return new ResultVO(Const2.SERVICE_SUCCESS, "成功", data);
+    }
+
+    public static ResultVO paramError(Object data) {
+        return new ResultVO(Const2.PARAMETER_FAIL, "参数有误", data);
+    }
 
 }

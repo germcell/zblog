@@ -1,6 +1,5 @@
 package com.zs.vo;
 
-import com.zs.pojo.TbComment;
 import lombok.Data;
 import lombok.ToString;
 
@@ -8,7 +7,7 @@ import java.util.List;
 
 /**
  * @author zengshuai
- * @create 2022-09-08 22:12
+ * @create 2022-09-10 20:58
  */
 @Data
 @ToString
@@ -17,6 +16,5 @@ public class MessageVO {
     private String avatar;
     private String name;
     private String sex;
-    private List<TbComment> comments;
-    // TODO 与用户相关的消息sql
+    private List<Long> commentIds;
 }

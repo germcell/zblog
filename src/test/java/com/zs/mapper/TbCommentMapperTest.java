@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import javax.annotation.Resource;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,5 +32,12 @@ class TbCommentMapperTest {
 
         System.out.println(list);
 
+    }
+
+    @Test
+    void getByIds() {
+        ArrayList<Long> ids = new ArrayList<>();
+        Collections.addAll(ids, 1L, 2L);
+        assertEquals(2, tbCommentMapper.getByIds(ids).size());
     }
 }

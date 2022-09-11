@@ -1,7 +1,9 @@
 package com.zs.service.impl;
 
 import com.zs.config.Const2;
+import com.zs.handler.UniversalException;
 import com.zs.mapper.TbCommentMapper;
+import com.zs.pojo.TbComment;
 import com.zs.service.MsgService;
 import com.zs.vo.CommentVO;
 import com.zs.vo.ResultVO;
@@ -26,8 +28,23 @@ public class MsgServiceImpl implements MsgService {
     private TbCommentMapper tbCommentMapper;
 
     public ResultVO getPrivateMsgByCIds(List<Long> cIds) {
-        // TODO sql编写
-        return null;
+        // 查询私信(他人)
+        List<TbComment> receive = tbCommentMapper.getByIds(cIds);
+
+        // 将私信置为已读
+        tbCommentMapper.updateStatusByIds(cIds, 1);
+
+        // 查询回复信息(我)
+        long sendId = receive.get(0).getReceiveId();
+        long receiveId = receive.get(0).getSendId();
+        List<TbComment> send = tbCommentMapper.getCommunication(sendId, receiveId);
+
+        if (send.size() == 0) return ResultVO.success(receive);
+
+        Map<String, List> result = new HashMap<>();
+        result.put("receive", receive);
+        result.put("send", send);
+        return ResultVO.success(result);
     }
 
     @Override

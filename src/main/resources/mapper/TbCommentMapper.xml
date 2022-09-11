@@ -20,6 +20,28 @@
         <result column="unread" property="unread"/>
     </resultMap>
 
+    <resultMap id="tbComment" type="com.zs.pojo.TbComment">
+        <id column="id" property="id"/>
+        <result column="send_id" property="sendId"/>
+        <result column="send_avatar" property="sendAvatar"/>
+        <result column="receive_id" property="receiveId"/>
+        <result column="receive_avatar" property="receiveAvatar"/>
+        <result column="content" property="content"/>
+        <result column="p_id" property="pId"/>
+        <result column="b_id" property="bId"/>
+        <result column="reply_time" property="replyTime"/>
+        <result column="msg_tag" property="msgTag"/>
+        <result column="is_read" property="isRead"/>
+        <result column="is_consume" property="isConsume"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <sql id="tb_comment_all_column">
+        id,send_id,send_avatar,receive_id,content,receive_avatar,p_id,bid,
+        reply_time, msg_tag,is_read,is_consume,create_time,update_time
+    </sql>
+
     <select id="getByReceiveId" parameterType="long" resultMap="commentVO">
         select c.id,c.send_id,c.receive_id,c.msg_tag,c.create_time,w.writer_name,w.writer_sex,w.writer_avatar
         from tb_comment c,tb_writer w
@@ -32,5 +54,28 @@
         from tb_comment c
         where c.receive_id = #{receiveId} and c.is_read = 0
         group by c.send_id
+    </select>
+
+    <select id="getByIds" parameterType="list" resultMap="tbComment">
+        select <include refid="tb_comment_all_column"/>
+        from tb_comment
+        where msg_tag = 0 and id in
+        <foreach collection="ids" item="id" open="(" separator=","  close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <update id="updateStatusByIds">
+        update tb_comment set is_read = #{isRead},reply_time=now()
+        where id in
+        <foreach collection="ids" item="id" open="(" separator=","  close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <select id="getCommunication" parameterType="long" resultMap="tbComment">
+        select <include refid="tb_comment_all_column"/>
+        from tb_comment
+        where send_id = #{sendId} and receive_id = #{receiveId} and msg_tag = 0;
     </select>
 </mapper>

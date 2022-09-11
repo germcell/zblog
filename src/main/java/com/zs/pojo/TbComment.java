@@ -9,7 +9,6 @@ import java.util.Date;
 @Data
 @ToString
 public class TbComment {
-
   private Long id;
   private Long sendId;
   private String sendAvatar;
@@ -17,12 +16,11 @@ public class TbComment {
   private String content;
   private String receiveAvatar;
   private Long pId;
-  private Long bid;
+  private Long bId;
   private Date replyTime;
   private Integer msgTag;
   private Integer isRead;
   private Integer isConsume;
   private Date createTime;
   private Date updateTime;
-  
 }

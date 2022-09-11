@@ -85,6 +85,7 @@ public class MsgController {
 
         try {
             List<Long> cIds = JSON.parseArray(cIdsJson, Long.class);
+            if (cIds.size() == 0) return ResultVO.paramError(cIdsJson);
             return msgService.getPrivateMsgByCIds(cIds);
         } catch (Exception e) {
             log.warn("获取用户私信异常==>{}", e);

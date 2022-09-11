@@ -26,4 +26,27 @@ public interface TbCommentMapper {
      * @return
      */
     List<CommentVO> getUnreadByReceiveId(@Param("receiveId") long receiveId);
+
+    /**
+     * 根据id集合获取记录
+     * @param ids
+     * @return
+     */
+    List<TbComment> getByIds(@Param("ids") List<Long> ids);
+
+    /**
+     * 批量修改私信状态
+     * @param cIds
+     * @param isRead
+     * @return
+     */
+    int updateStatusByIds(@Param("ids") List<Long> cIds, @Param("isRead") int isRead);
+
+    /**
+     * 获取回复
+     * @param sendId
+     * @param receiveId
+     * @return
+     */
+    List<TbComment> getCommunication(@Param("sendId") long sendId, @Param("receiveId") long receiveId);
 }

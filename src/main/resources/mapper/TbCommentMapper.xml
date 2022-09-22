@@ -16,6 +16,7 @@
     </resultMap>
 
     <resultMap id="unreadNumVO" type="com.zs.vo.CommentVO">
+        <id column="id" property="id"/>
         <result column="send_id" property="sendId"/>
         <result column="unread" property="unread"/>
     </resultMap>
@@ -77,5 +78,9 @@
         select <include refid="tb_comment_all_column"/>
         from tb_comment
         where send_id = #{sendId} and receive_id = #{receiveId} and msg_tag = 0;
+    </select>
+
+    <select id="getNewUnreadIds" resultMap="unreadNumVO">
+        select id from tb_comment where receive_id = #{receiveId} and send_id = #{sendId}
     </select>
 </mapper>

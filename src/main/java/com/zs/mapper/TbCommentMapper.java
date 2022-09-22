@@ -4,6 +4,7 @@ import com.zs.pojo.TbComment;
 import com.zs.vo.CommentVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -49,4 +50,12 @@ public interface TbCommentMapper {
      * @return
      */
     List<TbComment> getCommunication(@Param("sendId") long sendId, @Param("receiveId") long receiveId);
+
+    /**
+     * 获取未读私信id
+     * @param receiveId 接收者id
+     * @param sendId 发送者id
+     * @return
+     */
+    List<CommentVO> getNewUnreadIds(@Param("receiveId") long receiveId, @Param("sendId") long sendId);
 }

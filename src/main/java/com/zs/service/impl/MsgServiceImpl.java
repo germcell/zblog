@@ -1,12 +1,12 @@
 package com.zs.service.impl;
 
 import com.zs.config.Const2;
-import com.zs.handler.UniversalException;
 import com.zs.mapper.TbCommentMapper;
 import com.zs.pojo.TbComment;
 import com.zs.service.MsgService;
 import com.zs.vo.CommentVO;
 import com.zs.vo.ResultVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
  * @create 2022-09-07 15:04
  */
 @Service
+@Slf4j
 public class MsgServiceImpl implements MsgService {
 
     @Resource
@@ -39,8 +40,6 @@ public class MsgServiceImpl implements MsgService {
         long receiveId = receive.get(0).getSendId();
         List<TbComment> send = tbCommentMapper.getCommunication(sendId, receiveId);
 
-        if (send.size() == 0) return ResultVO.success(receive);
-
         Map<String, List> result = new HashMap<>();
         result.put("receive", receive);
         result.put("send", send);
@@ -53,7 +52,7 @@ public class MsgServiceImpl implements MsgService {
         List<CommentVO> comments = tbCommentMapper.getByReceiveId(uid);
 
         if (comments.size() == 0) {
-            return null;
+            return ResultVO.success(comments);
         }
 
         // 提取私信用户id(key)和最新的私信id(value)
@@ -99,12 +98,17 @@ public class MsgServiceImpl implements MsgService {
 
     @Override
     public void productMsg(String msgDTO) {
-        System.out.println("生产消息: " + msgDTO);
+        log.info("生产消息==>{}", msgDTO);
         amqpTemplate.convertAndSend(Const2.MSG_QUEUE_1, msgDTO);
     }
 
     @Override
     public ResultVO getUnreadMsgByUid(long uid) {
         return ResultVO.success(tbCommentMapper.getUnreadByReceiveId(uid));
+    }
+
+    @Override
+    public ResultVO getNewUnreadMsgIds(long receiveId, long sendId) {
+        return ResultVO.success(tbCommentMapper.getNewUnreadIds(receiveId, sendId));
     }
 }

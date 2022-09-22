@@ -5,6 +5,7 @@ import com.zs.dto.MsgDTO;
 import com.zs.service.MsgService;
 import com.zs.vo.ResultVO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +38,7 @@ public class MsgController {
     }
 
     /**
-     * 获取指定用户的所有私信用户信息
+     * 获取指定用户的所有私信用户信息(聊天框左侧私信列表)
      * @return
      */
     @GetMapping("/user/{uid}")
@@ -91,7 +92,30 @@ public class MsgController {
             log.warn("获取用户私信异常==>{}", e);
             return ResultVO.paramError(cIdsJson);
         }
+    }
 
+
+    @GetMapping("newUnread/{receiveId}/{sendId}")
+    public ResultVO newUnread(@PathVariable("receiveId") String receiveId,
+                              @PathVariable("sendId") String sendId) {
+
+        if (Objects.isNull(receiveId))
+            return ResultVO.paramError(null);
+        if (Objects.isNull(sendId))
+            return ResultVO.paramError(null);
+        if (receiveId.trim().length() == 0)
+            return ResultVO.paramError(receiveId + "," + sendId);
+        if (sendId.trim().length() == 0)
+            return ResultVO.paramError(receiveId + "," + sendId);
+
+        try {
+            long receiveIdNum = Long.parseLong(receiveId);
+            long sendIdNum = Long.parseLong(sendId);
+            return msgService.getNewUnreadMsgIds(receiveIdNum, sendIdNum);
+        } catch (NumberFormatException e) {
+            log.warn("获取用户新增私信异常==>{}", e);
+            return ResultVO.paramError(receiveId + "," + sendId);
+        }
     }
 
 }

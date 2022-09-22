@@ -19,6 +19,7 @@ spring:
     host: 43.138.135.209
     port: 6379
     database: 0
+    password: root@123
 
   # druid数据源配置
   datasource:

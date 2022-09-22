@@ -36,4 +36,12 @@ public interface MsgService {
      * @return
      */
     ResultVO getUnreadMsgByUid(long uid);
+
+    /**
+     * 获取用户新增私信
+     * @param receiveId
+     * @param sendId
+     * @return
+     */
+    ResultVO getNewUnreadMsgIds(long receiveId, long sendId);
 }

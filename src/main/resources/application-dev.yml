@@ -3,7 +3,6 @@ server:
   port: 7860
 
 spring:
-  # rabbitmq
   rabbitmq:
     host: 43.138.135.209
     port: 5672
@@ -14,14 +13,15 @@ spring:
     publisher-returns: true         # 开启return机制
 
   mvc:
-    # 静态资源访问前缀
-    static-path-pattern: /res/**
     # rest风格
     hiddenmethod:
       filter:
         enabled: true
     favicon:
       enabled: false
+    # swagger2 3.0
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
 
   # redis
   redis:
@@ -40,19 +40,6 @@ spring:
   servlet:
     multipart:
       max-file-size: 20MB
-
-  #thymeleaf
-  thymeleaf:
-    prefix: classpath:/templates/
-    suffix: .html
-    mode: LEGACYHTML5
-    encoding: UTF-8
-    servlet:
-      content-type: text/html
-
-  # elasticSearch
-#  elasticsearch:
-#    uris: http://43.138.135.209:9200
 
 # mybaits包扫描、别名
 mybatis:
@@ -75,9 +62,6 @@ pagehelper:
   pageSizeZero: false #pageSize=0 返回所有
   params: count=countSql
 
-postAvatar: /res/images/avatar22.jpg
-replyAvatar: /res/images/avatar23.jpg
-
 # 支付宝支付
 alipay:
   appId: 2021000120613259
@@ -85,3 +69,6 @@ alipay:
   alipayPublicKey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnZEmp+eSCwpZjKXNQtGj/cZI28s+b4RUER6Ku5eyTLPk1MtAvSlr+SPxRunRlIGCVkuhUNJpvYc3Yc1J882AF4IQrG+Npre/xt6Om0G0vJeC2XwqdPNkEXA+tYHdTWgGw5ih24/wltqr0sSUSW1N9OAdMGwOv057ZFBHRPYrrlHbvw8xWC7t++Ih7YoYSs/gpLJS49f3KeninrFAFGhjcdnQ5eT0BcL3WYy/VuULF+zoin38gvPXRgtfc0gQTf6Un2yyVpTrFO2ddcuUQoH48LvSVxtyWASEPDySdlFcLuHnc2rqpm+to79clUzTExlxbdAH+KubWULGlnvx+Q5wSQIDAQAB
   notifyUrl: https://583e-183-230-207-139.ngrok.io/v2/my-alipay/pay-notify
 
+esHost: 43.138.135.209
+esPort: 9200
+esScheme: http

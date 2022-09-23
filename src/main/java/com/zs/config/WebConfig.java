@@ -1,6 +1,5 @@
 package com.zs.config;
 
-import com.zs.handler.AdminLoginInterceptor;
 import com.zs.handler.UserLoginInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,11 +20,6 @@ public class WebConfig implements WebMvcConfigurer {
     /* 登录拦截器 */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new AdminLoginInterceptor())
-                .addPathPatterns("/**")
-                .excludePathPatterns("/admin/loginPage", "/admin/login", "/admin/login.do",
-                                     "/admin/loginOut", "/admin/validate", "/admin/register.do",
-                                     "/res/**", "/error","/blog/**","/main/**", "/v2/**");
         registry.addInterceptor(new UserLoginInterceptor())
                 .addPathPatterns("/v2/**")
                 .excludePathPatterns("/v2/index/**")
@@ -38,7 +32,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/v2/thumbs-up/get/*")
                 .excludePathPatterns("/v2/my-alipay/pay")
                 .excludePathPatterns("/v2/my-alipay/pay-notify")
-                .excludePathPatterns("/v2/msg/**");
+                .excludePathPatterns("/v2/msg/**")
+                .excludePathPatterns("/swagger-ui/**");
     }
 
     /* 实时显示上传后的文件，而不需重启服务器 */

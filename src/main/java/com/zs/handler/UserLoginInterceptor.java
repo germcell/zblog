@@ -7,6 +7,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -23,6 +24,7 @@ import java.io.PrintWriter;
  * 4.返回结果
  * @Created by zs on 2022/4/20.
  */
+@Slf4j
 @Component
 public class UserLoginInterceptor implements HandlerInterceptor {
 
@@ -30,6 +32,11 @@ public class UserLoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        // 放行swagger文档
+        if (request.getRequestURL().toString().contains("api-docs")) {
+            return true;
+        }
+
         // 预检操作
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             return true;
@@ -37,14 +44,17 @@ public class UserLoginInterceptor implements HandlerInterceptor {
         // 获取token
         String token = request.getHeader("token");
         if (token == null) {
+            log.info("操作拦截,未登录");
             doResponse(response, new ResultVO(Const2.NO_LOGIN, "please login", null));
             return false;
         }
         // 解析
         try {
             Jws<Claims> claimsJws = parser.parseClaimsJws(token);
+            log.info("授权放行,token==>{}", token);
             return true;
         } catch (Exception e) {
+            log.info("操作拦截,token错误");
             doResponse(response, new ResultVO(Const2.TOKEN_EXPIRE, "token expire", null));
             return false;
         }

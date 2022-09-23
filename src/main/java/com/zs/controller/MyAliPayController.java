@@ -7,8 +7,10 @@ import com.zs.dto.AliPayDTO;
 import com.zs.handler.DateUtils;
 import com.zs.service.OrderService;
 import com.zs.vo.ResultVO;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -34,6 +36,7 @@ public class MyAliPayController {
      *         code == 525 失败【支付金额为0】、【传递非数字的金额，格式化异常】，【调用支付宝支付异常】
      *         code == 200 成功
      */
+    @ApiIgnore
     @GetMapping("/pay")
     public String pay(AliPayDTO aliPayDTO) {
         // 0.参数校验
@@ -74,6 +77,7 @@ public class MyAliPayController {
      * @return
      * @throws Exception
      */
+    @ApiIgnore
     @PostMapping("/pay-notify")
     public String notify(HttpServletRequest request) throws Exception {
         if (Objects.equals("TRADE_SUCCESS", request.getParameter("trade_status"))) {

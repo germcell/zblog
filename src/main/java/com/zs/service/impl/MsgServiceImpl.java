@@ -9,6 +9,8 @@ import com.zs.vo.ResultVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -48,7 +50,7 @@ public class MsgServiceImpl implements MsgService {
 
     @Override
     public ResultVO getPrivateMsgUserInfoByUid(long uid) {
-        // 获取私信信息
+        // 获取用户的私信信息
         List<CommentVO> comments = tbCommentMapper.getByReceiveId(uid);
 
         if (comments.size() == 0) {
@@ -110,5 +112,12 @@ public class MsgServiceImpl implements MsgService {
     @Override
     public ResultVO getNewUnreadMsgIds(long receiveId, long sendId) {
         return ResultVO.success(tbCommentMapper.getNewUnreadIds(receiveId, sendId));
+    }
+
+    @Transactional
+    @Override
+    public ResultVO deleteAllMsgByUser(long sendId, long receiveId) {
+        tbCommentMapper.updateBySendIdAndReceiveId(sendId, receiveId);
+        return ResultVO.success(null);
     }
 }

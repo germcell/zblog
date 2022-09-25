@@ -11,7 +11,7 @@ import java.util.List;
 public interface MsgService {
 
     /**
-     * 获取指定用户的私信信息
+     * 获取指定用户的私信信息，根据消息id查询
      * @param cIds
      * @return
      */
@@ -44,4 +44,12 @@ public interface MsgService {
      * @return
      */
     ResultVO getNewUnreadMsgIds(long receiveId, long sendId);
+
+    /**
+     * 删除和某个用户的对话，只是单向的，即当前用户删除后自己不可见，对方仍然可见
+     * @param sendId
+     * @param receiveId
+     * @return
+     */
+    ResultVO deleteAllMsgByUser(long sendId, long receiveId);
 }

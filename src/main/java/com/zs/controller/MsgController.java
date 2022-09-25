@@ -128,4 +128,14 @@ public class MsgController {
         }
     }
 
+    @ApiOperation("删除和某用户的对话")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "sendId", value = "消息发送者id", paramType = "path", required = true, dataTypeClass = Long.class),
+        @ApiImplicitParam(name = "receiveId", value = "消息接收者id", paramType = "path", required = true, dataTypeClass = Long.class),
+    })
+    @DeleteMapping("/del/{sendId}/{receiveId}")
+    public ResultVO del(@PathVariable("sendId") long sendId, @PathVariable("receiveId") long receiveId) {
+        return msgService.deleteAllMsgByUser(sendId, receiveId);
+    }
+
 }

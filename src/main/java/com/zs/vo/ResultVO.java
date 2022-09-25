@@ -27,4 +27,7 @@ public class ResultVO {
         return new ResultVO(Const2.PARAMETER_FAIL, "参数有误", data);
     }
 
+    public static ResultVO globalException() {
+        return new ResultVO(Const2.GLOBAL_EXCEPTION, "系统错误", null);
+    }
 }

@@ -16,6 +16,8 @@ public class Const2 {
     public static final String ARTICLE_PICTURE_SAVE_DIR_LINUX = "/usr/local/server/nginx/blog_static/images/fp/";
     public static final String USER_AVATAR_SAVE_DIR_LINUX = "/usr/local/server/nginx/blog_static/images/avatar/";
 
+
+    public static final Integer GLOBAL_EXCEPTION = -1; // 全局异常
     public static final Integer PARAMETER_FAIL = 301; // 请求参数不符合规则
 
     public static final Integer NOT_FOUND = 404; // 访问资源不存在

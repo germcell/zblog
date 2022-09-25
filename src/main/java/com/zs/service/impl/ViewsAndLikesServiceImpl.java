@@ -5,9 +5,7 @@ import com.zs.mapper.BlogMapper;
 import com.zs.mapper.BlogOutlineMapper;
 import com.zs.pojo.Blog;
 import com.zs.pojo.BlogOutline;
-import com.zs.pojo.Comment;
 import com.zs.service.ViewsAndLikesService;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

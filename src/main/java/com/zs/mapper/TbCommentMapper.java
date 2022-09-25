@@ -58,4 +58,12 @@ public interface TbCommentMapper {
      * @return
      */
     List<CommentVO> getNewUnreadIds(@Param("receiveId") long receiveId, @Param("sendId") long sendId);
+
+    /**
+     * 修改receiveId和sendId的对话是否可见
+     * @param sendId 发送者id
+     * @param receiveId 接收者id
+     * @return
+     */
+    int updateBySendIdAndReceiveId(@Param("sendId") long sendId, @Param("receiveId") long receiveId);
 }

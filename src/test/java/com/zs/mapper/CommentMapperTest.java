@@ -1,16 +1,11 @@
 package com.zs.mapper;
 
-import com.alibaba.druid.sql.visitor.functions.Now;
-import com.zs.pojo.Comment;
 import com.zs.pojo.MDate;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @Created by zs on 2022/3/11.

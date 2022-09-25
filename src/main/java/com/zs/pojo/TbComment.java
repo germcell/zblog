@@ -23,4 +23,7 @@ public class TbComment {
   private Integer isConsume;
   private Date createTime;
   private Date updateTime;
+  private Integer sendVisible;
+  private Integer receiveVisible;
+  private Integer exp;
 }

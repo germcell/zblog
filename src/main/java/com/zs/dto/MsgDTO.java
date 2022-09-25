@@ -2,15 +2,17 @@ package com.zs.dto;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+
 /**
  * @author zengshuai
  * @create 2022-09-07 14:54
  */
 @Data
 public class MsgDTO {
-    /** 发件人id */
+    @NotBlank(message = "请提供消息发送者ID")
     private Long sendId;
-    /** 收件人id */
+    @NotBlank(message = "请提供消息接收者ID")
     private Long receiveId;
     /** 发件内容 */
     private String content;

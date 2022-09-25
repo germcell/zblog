@@ -36,17 +36,24 @@
         <result column="is_consume" property="isConsume"/>
         <result column="create_time" property="createTime"/>
         <result column="update_time" property="updateTime"/>
+        <result column="send_visible" property="sendVisible"/>
+        <result column="receive_visible" property="receiveVisible"/>
+        <result column="exp" property="exp"/>
     </resultMap>
 
     <sql id="tb_comment_all_column">
-        id,send_id,send_avatar,receive_id,content,receive_avatar,p_id,bid,
-        reply_time, msg_tag,is_read,is_consume,create_time,update_time
+        id,send_id,send_avatar,receive_id,content,receive_avatar,p_id,bid,reply_time,
+        msg_tag,is_read,is_consume,create_time,update_time,send_visible,receive_visible,exp
     </sql>
 
     <select id="getByReceiveId" parameterType="long" resultMap="commentVO">
         select c.id,c.send_id,c.receive_id,c.msg_tag,c.create_time,w.writer_name,w.writer_sex,w.writer_avatar
         from tb_comment c,tb_writer w
-        where c.receive_id = #{receiveId} and c.msg_tag = 0 and c.send_id = w.uid
+        where c.receive_id = #{receiveId}
+        and c.msg_tag = 0
+        and c.send_id = w.uid
+        and c.receive_visible = 1
+        and c.send_visible = 1
         order by c.create_time desc
     </select>
 
@@ -83,4 +90,8 @@
     <select id="getNewUnreadIds" resultMap="unreadNumVO">
         select id from tb_comment where receive_id = #{receiveId} and send_id = #{sendId}
     </select>
+
+    <update id="updateBySendIdAndReceiveId">
+        update tb_comment set receive_visible = 0 where receive_id = #{receiveId} and send_id = #{sendId}
+    </update>
 </mapper>

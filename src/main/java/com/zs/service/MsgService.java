@@ -1,5 +1,6 @@
 package com.zs.service;
 
+import com.zs.dto.MsgDTO;
 import com.zs.vo.ResultVO;
 
 import java.util.List;
@@ -52,4 +53,19 @@ public interface MsgService {
      * @return
      */
     ResultVO deleteAllMsgByUser(long sendId, long receiveId);
+
+    /**
+     * 分页查询文章评论信息
+     * @param bid 文章id
+     * @param p 页码
+     * @return
+     */
+    ResultVO getPageArticleComments(long bid, int p);
+
+    /**
+     * 添加文章评论
+     * @param msgDTO
+     * @return
+     */
+    ResultVO addComment(MsgDTO msgDTO);
 }

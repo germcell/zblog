@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -83,7 +84,7 @@ public class MsgController {
      * @param cIdsJson
      * @return
      */
-    @ApiOperation("获取对话信息")
+    @ApiOperation("获取私信对话信息")
     @ApiImplicitParam(name = "cIdsJson", value = "私信idJson", paramType = "body", required = true, dataTypeClass = String.class)
     @PostMapping("/private")
     public ResultVO getAllPrivateMsg(@RequestBody String cIdsJson) {
@@ -105,7 +106,7 @@ public class MsgController {
         @ApiImplicitParam(name = "receiveId", value = "接收者id", paramType = "path", required = true, dataTypeClass = String.class),
         @ApiImplicitParam(name = "sendId", value = "发送者id", paramType = "path", required = true, dataTypeClass = String.class)
     })
-    @GetMapping("newUnread/{receiveId}/{sendId}")
+    @GetMapping("/newUnread/{receiveId}/{sendId}")
     public ResultVO newUnread(@PathVariable("receiveId") String receiveId,
                               @PathVariable("sendId") String sendId) {
 
@@ -128,14 +129,35 @@ public class MsgController {
         }
     }
 
-    @ApiOperation("删除和某用户的对话")
+    @ApiOperation("删除私信对话")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "sendId", value = "消息发送者id", paramType = "path", required = true, dataTypeClass = Long.class),
-        @ApiImplicitParam(name = "receiveId", value = "消息接收者id", paramType = "path", required = true, dataTypeClass = Long.class),
+        @ApiImplicitParam(name = "receiveId", value = "消息接收者id【删除发起者】", paramType = "path", required = true, dataTypeClass = Long.class),
     })
     @DeleteMapping("/del/{sendId}/{receiveId}")
     public ResultVO del(@PathVariable("sendId") long sendId, @PathVariable("receiveId") long receiveId) {
         return msgService.deleteAllMsgByUser(sendId, receiveId);
     }
+
+    @ApiOperation("分页查询文章评论")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "bid", value = "文章id", paramType = "path", required = true, dataTypeClass = Long.class),
+        @ApiImplicitParam(name = "p", value = "页码", paramType = "query", required = true, dataTypeClass = Integer.class)
+    })
+    @GetMapping("/comments/{bid}")
+    public ResultVO getComments(@PathVariable("bid") long bid, @RequestParam("p") int p) {
+        return msgService.getPageArticleComments(bid, p);
+    }
+
+    @ApiOperation("添加/回复文章评论")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "msgDTO", value = "评论详情对象", paramType = "body",required = true, dataTypeClass = MsgDTO.class),
+        @ApiImplicitParam(name = "token", value = "用户身份token", required = true, paramType = "header", dataTypeClass = String.class)
+    })
+    @PostMapping("/comments")
+    public ResultVO add(@RequestBody @Validated MsgDTO msgDTO, @RequestHeader String token) {
+        return msgService.addComment(msgDTO);
+    }
+
 
 }

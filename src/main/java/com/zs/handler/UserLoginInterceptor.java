@@ -51,7 +51,7 @@ public class UserLoginInterceptor implements HandlerInterceptor {
         // 解析
         try {
             Jws<Claims> claimsJws = parser.parseClaimsJws(token);
-            log.info("授权放行,token==>{}", token);
+            log.info("授权token==>{}", token);
             return true;
         } catch (Exception e) {
             log.info("操作拦截,token错误");

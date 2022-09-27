@@ -1,6 +1,5 @@
 package com.zs.vo;
 
-import com.zs.pojo.TbComment;
 import lombok.Data;
 import lombok.ToString;
 
@@ -8,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 私信用户列表展示
  * @author zengshuai
  * @create 2022-09-08 22:12
  */

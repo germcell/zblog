@@ -1,10 +1,10 @@
 package com.zs.mapper;
 
 import com.zs.pojo.TbComment;
+import com.zs.vo.ArticleCommentVO;
 import com.zs.vo.CommentVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -66,4 +66,33 @@ public interface TbCommentMapper {
      * @return
      */
     int updateBySendIdAndReceiveId(@Param("sendId") long sendId, @Param("receiveId") long receiveId);
+
+    /**
+     * 查询文章的根评论
+     * @param bid
+     * @return
+     */
+    List<ArticleCommentVO> pageRootComments(@Param("bid") long bid);
+
+    /**
+     * 根据消息id查询
+     * @param id
+     * @return
+     */
+    ArticleCommentVO getCommentById(@Param("id") long id);
+
+    /**
+     * 查询指定文章的指定父评论的一级子评论
+     * @param bid 文章id
+     * @param pid 父评论id
+     * @return
+     */
+    List<ArticleCommentVO> listCommentsByPid(@Param("bid") long bid, @Param("pid") long pid);
+
+    /**
+     * 插入
+     * @param newComment
+     * @return
+     */
+    int insert(@Param("comment") TbComment newComment);
 }

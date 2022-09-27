@@ -40,4 +40,5 @@ class TbCommentMapperTest {
         Collections.addAll(ids, 1L, 2L);
         assertEquals(2, tbCommentMapper.getByIds(ids).size());
     }
+
 }

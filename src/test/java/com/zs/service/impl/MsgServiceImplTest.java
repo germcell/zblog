@@ -22,4 +22,9 @@ class MsgServiceImplTest {
     void getPrivateMsgUserInfoByUid() {
         msgService.getPrivateMsgUserInfoByUid(7);
     }
+
+    @Test
+    void t2() {
+       msgService.getPageArticleComments(41, 2);
+    }
 }

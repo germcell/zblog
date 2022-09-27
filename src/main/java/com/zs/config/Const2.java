@@ -46,6 +46,8 @@ public class Const2 {
     public static final Integer SEND_MAIL_FAIL = 611; // 验证码邮箱发送失败
     public static final Integer SEND_MAIL_SUCCESS = 612; // 验证码邮箱发送成功
 
+    public static final Integer ARTICLE_COMMENT_PAGE_SIZE = 2; // 文章评论每页显示条数
+
     /**
      * 用户已经关注(用户)
      */

@@ -1,5 +1,6 @@
 package com.zs.mapper;
 
+import com.zs.pojo.Comment;
 import com.zs.pojo.MDate;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

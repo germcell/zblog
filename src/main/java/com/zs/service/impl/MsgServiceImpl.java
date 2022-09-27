@@ -1,15 +1,18 @@
 package com.zs.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.zs.config.Const2;
+import com.zs.dto.MsgDTO;
 import com.zs.mapper.TbCommentMapper;
 import com.zs.pojo.TbComment;
 import com.zs.service.MsgService;
+import com.zs.vo.ArticleCommentVO;
 import com.zs.vo.CommentVO;
 import com.zs.vo.ResultVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -120,4 +123,63 @@ public class MsgServiceImpl implements MsgService {
         tbCommentMapper.updateBySendIdAndReceiveId(sendId, receiveId);
         return ResultVO.success(null);
     }
+
+    @Override
+    public ResultVO getPageArticleComments(long bid, int p) {
+        // 分页查询根评论
+        PageHelper.startPage(p, Const2.ARTICLE_COMMENT_PAGE_SIZE);
+        List<ArticleCommentVO> rootComments = tbCommentMapper.pageRootComments(bid);
+        List<ArticleCommentVO> rootCommentTrees = new ArrayList<>();
+
+        // 生成每个根节点的评论树
+        rootComments.stream().forEach(root -> {
+            rootCommentTrees.add(commentTree(root));
+        });
+
+        PageInfo<ArticleCommentVO> pageInfo = new PageInfo<>(rootComments);
+
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("commentPageInfo", pageInfo);
+        map.put("commentTrees", rootCommentTrees);
+
+        return ResultVO.success(map);
+    }
+
+    /**
+     * 递归生成评论节点的评论树
+     * @param rootComment 评论节点
+     * @return
+     */
+    private ArticleCommentVO commentTree(ArticleCommentVO rootComment) {
+        List<ArticleCommentVO> childComments = tbCommentMapper.listCommentsByPid(rootComment.getBid(), rootComment.getId());
+
+        if (childComments.size() == 0) {
+            return rootComment;
+        }
+
+        childComments.stream().forEach(child -> {
+            if (Objects.isNull(rootComment.getChildComments())) {
+                rootComment.setChildComments(new ArrayList<>());
+            }
+            rootComment.getChildComments().add(commentTree(child));
+        });
+
+        return rootComment;
+    }
+
+    @Override
+    public ResultVO addComment(MsgDTO msgDTO) {
+        // 插入评论
+        TbComment newComment = new TbComment();
+        newComment.setSendId(msgDTO.getSendId());
+        newComment.setReceiveId(msgDTO.getReceiveId());
+        newComment.setContent(msgDTO.getContent());
+        newComment.setPId(msgDTO.getPid());
+        newComment.setBId(msgDTO.getBid());
+        newComment.setMsgTag(1);
+        newComment.setIsConsume(1);
+        tbCommentMapper.insert(newComment);
+        return ResultVO.success(null);
+    }
+
 }

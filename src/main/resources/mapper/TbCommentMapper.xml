@@ -41,9 +41,32 @@
         <result column="exp" property="exp"/>
     </resultMap>
 
+    <resultMap id="articleCommentVO" type="com.zs.vo.ArticleCommentVO">
+        <id column="id" property="id"/>
+        <result column="send_id" property="sendId"/>
+        <result column="receive_id" property="receiveId"/>
+        <result column="send_name" property="sendName"/>
+        <result column="receive_name" property="receiveName"/>
+        <result column="send_avatar" property="sendAvatar"/>
+        <result column="receive_avatar" property="receiveAvatar"/>
+        <result column="send_sex" property="sendSex"/>
+        <result column="receive_sex" property="receiveSex"/>
+        <result column="content" property="content"/>
+        <result column="p_id" property="pid"/>
+        <result column="bid" property="bid"/>
+        <result column="msg_tag" property="msgTag"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
     <sql id="tb_comment_all_column">
         id,send_id,send_avatar,receive_id,content,receive_avatar,p_id,bid,reply_time,
         msg_tag,is_read,is_consume,create_time,update_time,send_visible,receive_visible,exp
+    </sql>
+
+    <sql id="articleCommentVO_column">
+        w1.writer_avatar send_avatar,w1.writer_name send_name,w1.writer_sex send_sex,
+        w2.writer_avatar receive_avatar,w2.writer_name receive_name,w2.writer_sex receive_sex,
+        c.id,c.send_id,c.receive_id,c.content,c.p_id,c.bid,c.msg_tag,c.create_time
     </sql>
 
     <select id="getByReceiveId" parameterType="long" resultMap="commentVO">
@@ -94,4 +117,35 @@
     <update id="updateBySendIdAndReceiveId">
         update tb_comment set receive_visible = 0 where receive_id = #{receiveId} and send_id = #{sendId}
     </update>
+
+    <select id="pageRootComments" resultMap="articleCommentVO">
+        select <include refid="articleCommentVO_column"/>
+        from tb_comment c,tb_writer w1,tb_writer w2
+        where c.bid = #{bid} and c.p_id = -1 and c.send_visible = 1 and c.receive_visible = 1
+        and w1.uid = c.send_id and w2.uid = c.receive_id
+        order by c.create_time desc
+    </select>
+
+    <select id="getCommentById" resultMap="articleCommentVO">
+        select <include refid="articleCommentVO_column"/>
+        from tb_comment c,tb_writer w1,tb_writer w2
+        where c.id = #{id} and c.send_visible = 1 and c.receive_visible = 1
+        and w1.uid = c.send_id and w2.uid = c.receive_id
+    </select>
+
+    <select id="listCommentsByPid" resultMap="articleCommentVO">
+        select <include refid="articleCommentVO_column"/>
+        from tb_comment c,tb_writer w1,tb_writer w2
+        where c.bid = #{bid}
+        and c.p_id = #{pid}
+        and c.send_visible = 1 and c.receive_visible = 1
+        and w1.uid = c.send_id and w2.uid = c.receive_id
+        order by c.create_time desc
+    </select>
+
+    <insert id="insert" parameterType="com.zs.pojo.TbComment">
+        insert into tb_comment values
+        (null,#{comment.sendId},null,#{comment.receiveId},#{comment.content},null,#{comment.pId},#{comment.bId},null,#{comment.msgTag},
+         0,#{comment.isConsume},now(),now(),1,1,null)
+    </insert>
 </mapper>

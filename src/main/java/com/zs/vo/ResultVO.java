@@ -28,6 +28,6 @@ public class ResultVO {
     }
 
     public static ResultVO globalException() {
-        return new ResultVO(Const2.GLOBAL_EXCEPTION, "系统错误", null);
+        return new ResultVO(Const2.GLOBAL_EXCEPTION, "系统异常", null);
     }
 }

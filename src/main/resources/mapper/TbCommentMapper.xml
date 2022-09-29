@@ -90,7 +90,7 @@
     <select id="getByIds" parameterType="list" resultMap="tbComment">
         select <include refid="tb_comment_all_column"/>
         from tb_comment
-        where msg_tag = 0 and id in
+        where msg_tag = #{msgTag} and id in
         <foreach collection="ids" item="id" open="(" separator=","  close=")">
             #{id}
         </foreach>
@@ -148,4 +148,18 @@
         (null,#{comment.sendId},null,#{comment.receiveId},#{comment.content},null,#{comment.pId},#{comment.bId},null,#{comment.msgTag},
          0,#{comment.isConsume},now(),now(),1,1,null)
     </insert>
+
+    <select id="getCommentByPid" resultMap="tbComment">
+        select <include refid="tb_comment_all_column"/>
+        from tb_comment
+        where p_id = #{pid} and msg_tag = 1
+    </select>
+
+    <update id="updateByCondition" parameterType="com.zs.pojo.TbComment">
+        update tb_comment
+        <set>
+            <if test="condition.content!=null">content = #{condition.content},</if>
+        </set>
+        where id = #{condition.id}
+    </update>
 </mapper>

@@ -38,7 +38,7 @@ class TbCommentMapperTest {
     void getByIds() {
         ArrayList<Long> ids = new ArrayList<>();
         Collections.addAll(ids, 1L, 2L);
-        assertEquals(2, tbCommentMapper.getByIds(ids).size());
+        assertEquals(2, tbCommentMapper.getByIds(ids, 0).size());
     }
 
 }

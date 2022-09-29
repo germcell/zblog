@@ -68,4 +68,12 @@ public interface MsgService {
      * @return
      */
     ResultVO addComment(MsgDTO msgDTO);
+
+    /**
+     * 根据id删除评论
+     * @param commentId
+     * @return
+     */
+    ResultVO deleteCommentById(long commentId);
+
 }

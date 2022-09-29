@@ -3,6 +3,7 @@ package com.zs.mapper;
 import com.zs.pojo.TbComment;
 import com.zs.vo.ArticleCommentVO;
 import com.zs.vo.CommentVO;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -31,9 +32,10 @@ public interface TbCommentMapper {
     /**
      * 根据id集合获取记录
      * @param ids
+     * @param msgTag 消息类型
      * @return
      */
-    List<TbComment> getByIds(@Param("ids") List<Long> ids);
+    List<TbComment> getByIds(@Param("ids") List<Long> ids, @Param("msgTag") int msgTag);
 
     /**
      * 批量修改私信状态
@@ -95,4 +97,26 @@ public interface TbCommentMapper {
      * @return
      */
     int insert(@Param("comment") TbComment newComment);
+
+    /**
+     * 根据pid查询
+     * @param pid
+     * @return
+     */
+    List<TbComment> getCommentByPid(@Param("pid") long pid);
+
+    /**
+     * 根据id删除
+     * @param id
+     * @return
+     */
+    @Delete("delete from tb_comment where id = #{id}")
+    int deleteById(@Param("id") long id);
+
+    /**
+     * 动态sql，修改记录
+     * @param condition
+     * @return
+     */
+    int updateByCondition(@Param("condition") TbComment condition);
 }

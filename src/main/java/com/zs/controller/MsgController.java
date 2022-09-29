@@ -159,5 +159,14 @@ public class MsgController {
         return msgService.addComment(msgDTO);
     }
 
+    @ApiOperation("删除文章评论")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "commentId", value = "评论id", paramType = "path", required = true, dataTypeClass = Long.class),
+        @ApiImplicitParam(name = "token", value = "用户身份token", paramType = "header", required = true, dataTypeClass = String.class)
+    })
+    @DeleteMapping("/commentDel/{commentId}")
+    public ResultVO commentDel(@PathVariable("commentId") long commentId, @RequestHeader String token) {
+        return msgService.deleteCommentById(commentId);
+    }
 
 }

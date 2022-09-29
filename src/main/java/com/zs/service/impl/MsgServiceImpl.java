@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MsgServiceImpl implements MsgService {
 
+    private static final String COMMENT_DELETE_TAG = "<span style='color: #999;'>此评论已被删除</span>";
+
     @Resource
     private AmqpTemplate amqpTemplate;
     @Resource
@@ -35,7 +37,7 @@ public class MsgServiceImpl implements MsgService {
 
     public ResultVO getPrivateMsgByCIds(List<Long> cIds) {
         // 查询私信(他人)
-        List<TbComment> receive = tbCommentMapper.getByIds(cIds);
+        List<TbComment> receive = tbCommentMapper.getByIds(cIds, 0);
 
         // 将私信置为已读
         tbCommentMapper.updateStatusByIds(cIds, 1);
@@ -180,6 +182,56 @@ public class MsgServiceImpl implements MsgService {
         newComment.setIsConsume(1);
         tbCommentMapper.insert(newComment);
         return ResultVO.success(null);
+    }
+
+    @Transactional
+    @Override
+    public ResultVO deleteCommentById(long commentId) {
+        List<Long> ids = new ArrayList<>();
+        ids.add(commentId);
+
+        // 查询根评论，及其子评论
+        List<TbComment> byIds = tbCommentMapper.getByIds(ids, 1);
+        TbComment root = byIds.get(0);
+        List<TbComment> children = tbCommentMapper.getCommentByPid(root.getId());
+
+        // 被删除评论是根评论，且没有没有子评论，则直接删除
+        if ((root.getPId() == -1 || root.getPId() != -1) && children.size() == 0) {
+            tbCommentMapper.deleteById(root.getId());
+            log.info("删除评论ID==>{}", commentId);
+            return ResultVO.success(null);
+        }
+
+        // 被删除评论是根评论，且有子评论，则将根评论置为特定值
+        if ((root.getPId() == -1 || root.getPId() != -1) && children.size() > 0) {
+            TbComment condition = new TbComment();
+            condition.setId(root.getId());
+            condition.setContent(COMMENT_DELETE_TAG);
+            tbCommentMapper.updateByCondition(condition);
+            log.info("删除评论ID==>{}", commentId);
+            return ResultVO.success(null);
+        }
+
+        // 被删除的是子评论，但没有子评论，则直接删除
+//        if (root.getPId() != -1 && children.size() == 0) {
+//            tbCommentMapper.deleteById(root.getId());
+//            log.info("删除评论ID==>", commentId);
+//            return ResultVO.success(null);
+//        }
+//
+//        // 被删除的是子评论，但其还有子评论，则置为特定值
+//        if (root.getPId() != -1 && children.size() > 0) {
+//            TbComment condition = new TbComment();
+//            condition.setId(root.getId());
+//            condition.setContent(COMMENT_DELETE_TAG);
+//            tbCommentMapper.updateByCondition(condition);
+//            log.info("删除评论ID==>", commentId);
+//            return ResultVO.success(null);
+//        }
+
+        // TODO 被删除评论是子评论，且它的所有父评论都已被"删除"，则将其全部删除
+
+        return ResultVO.globalException();
     }
 
 }

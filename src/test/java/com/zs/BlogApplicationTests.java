@@ -112,6 +112,11 @@ class BlogApplicationTests {
         restHighLevelClient.delete(deleteRequest, RequestOptions.DEFAULT);
     }
 
+    /**
+     * 从数据库中导入文章基本信息到ES中做搜索
+     * TODO 服务器内存不够
+     * @throws IOException
+     */
     @Test
     void testImportDataInDBToES() throws IOException {
         // 1.查询数据库中的所有数据
@@ -141,6 +146,10 @@ class BlogApplicationTests {
         System.out.println(pageInfo);
     }
 
+    /**
+     * 从ES中获取文章信息，并根据其得分，导入redis中做排名
+     * @throws IOException
+     */
     @Test
     void testImportRankDataToRedis() throws IOException {
         List<BlogES> blogs = elasticSearchUtils.searchAll(Const2.ES_ARTICLE_INDEX, BlogES.class);
@@ -158,6 +167,10 @@ class BlogApplicationTests {
         articleRankRedisHelper.getRankTopN(ConstRedisKeyPrefix.ARTICLE_RANK, 0 , 3);
     }
 
+    /**
+     * 将数据库的用户数据导入到ES中
+     * @throws Exception
+     */
     @Test
     void testImportWriterDataToES() throws Exception {
         WriterES writerES = new WriterES();

@@ -140,22 +140,74 @@ INSERT INTO `tb_category` VALUES (35, 'Git', 6, '2022-03-28 12:49:31', '', '/res
 -- ----------------------------
 DROP TABLE IF EXISTS `tb_comment`;
 CREATE TABLE `tb_comment`  (
-  `id` bigint(0) NOT NULL AUTO_INCREMENT COMMENT '自增id、信息id',
-  `send_id` bigint(0) NOT NULL COMMENT '发件人id',
-  `send_avatar` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '发件人头像',
-  `receive_id` bigint(0) NOT NULL COMMENT '收件人id',
-  `content` varchar(300) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '内容',
-  `receive_avatar` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '收件人头像',
-  `p_id` bigint(0) NULL DEFAULT -1 COMMENT '当msg_tag为1时的被回复消息id',
-  `bid` int(0) NOT NULL DEFAULT -1 COMMENT '当msg_tag为1时的文章id',
-  `reply_time` datetime(0) NULL DEFAULT NULL COMMENT '回复时间',
-  `msg_tag` int(0) NOT NULL COMMENT '信件类型（0：私信 1：文章评论）',
-  `is_read` tinyint(1) NOT NULL COMMENT '收件人是否已读（0：未读 1：已读）',
-  `is_consume` tinyint(1) NULL DEFAULT NULL COMMENT '是否消费（0：未消费，1：已消费）',
-  `create_time` datetime(0)  DEFAULT NULL,
-  `update_time` datetime(0)  DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+   `id` bigint(0) NOT NULL AUTO_INCREMENT COMMENT '自增id、信息id',
+   `send_id` bigint(0) NOT NULL COMMENT '发件人id',
+   `send_avatar` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '发件人头像',
+   `receive_id` bigint(0) NOT NULL COMMENT '收件人id',
+   `content` varchar(300) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '内容',
+   `receive_avatar` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '收件人头像',
+   `p_id` bigint(0) NULL DEFAULT -1 COMMENT '文章评论的消息根id，固定为-1，置顶消息为0，评论由多个树组成，每一楼构成一棵树',
+   `bid` int(0) NOT NULL DEFAULT -1 COMMENT '当msg_tag为1时的文章id',
+   `reply_time` datetime(0) NULL DEFAULT NULL COMMENT '回复时间',
+   `msg_tag` int(0) NOT NULL COMMENT '信件类型（0：私信 1：文章评论）',
+   `is_read` tinyint(1) NOT NULL COMMENT '收件人是否已读（0：未读 1：已读）',
+   `is_consume` tinyint(1) NULL DEFAULT NULL COMMENT '是否消费（0：未消费，1：已消费）',
+   `create_time` datetime(0) NULL DEFAULT NULL,
+   `update_time` datetime(0) NULL DEFAULT NULL,
+   `send_visible` tinyint(1) NOT NULL DEFAULT 1 COMMENT '发送人是否可见（0：不可见，1：可见），删除消息时设置',
+   `receive_visible` tinyint(1) NOT NULL DEFAULT 1 COMMENT '接收人是否可见（0：不可见，1：可见），查询时只有当这两个都为1才能显示',
+   `exp` int(0) NULL DEFAULT NULL COMMENT '扩充字段',
+   PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 62 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of tb_comment
+-- ----------------------------
+INSERT INTO `tb_comment` VALUES (1, 1, NULL, 7, '你好 hello ~', NULL, -1, -1, '2022-09-25 23:44:45', 0, 1, 1, '2022-09-10 22:51:59', '2022-09-08 10:51:59', 1, 0, NULL);
+INSERT INTO `tb_comment` VALUES (2, 1, NULL, 7, 'hello', NULL, -1, -1, '2022-09-25 23:44:45', 0, 1, 1, '2022-09-10 19:47:25', '2022-09-10 19:47:28', 1, 0, NULL);
+INSERT INTO `tb_comment` VALUES (3, 8, NULL, 7, 'hello', NULL, -1, -1, '2022-09-28 14:03:40', 0, 1, 1, '2022-09-10 19:48:14', '2022-09-10 19:48:16', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (4, 8, NULL, 7, 'hello', NULL, -1, -1, '2022-09-28 14:03:40', 0, 1, 1, '2022-09-10 19:49:43', '2022-09-10 19:49:45', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (7, 7, NULL, 1, '怎么了', NULL, -1, -1, '2022-09-25 23:45:49', 0, 1, 1, '2022-09-10 20:00:09', '2022-09-11 20:48:13', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (20, 7, NULL, 2, 'wwwww', NULL, -1, -1, '2022-09-22 23:15:26', 0, 1, 1, '2022-09-22 19:43:20', '2022-09-22 19:43:20', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (21, 7, NULL, 2, 'qqqqq', NULL, -1, -1, '2022-09-22 23:15:26', 0, 1, 1, '2022-09-22 19:52:50', '2022-09-22 19:52:50', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (23, 7, NULL, 2, 'ffff', NULL, -1, -1, '2022-09-22 23:15:26', 0, 1, 1, '2022-09-22 19:53:37', '2022-09-22 19:53:37', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (24, 7, NULL, 2, '11111', NULL, -1, -1, '2022-09-22 23:15:26', 0, 1, 1, '2022-09-22 20:00:24', '2022-09-22 20:00:24', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (25, 7, NULL, 2, 'how are u?', NULL, -1, -1, '2022-09-22 23:15:26', 0, 1, 1, '2022-09-22 20:56:18', '2022-09-22 20:56:18', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (26, 7, NULL, 2, 'nice to meet to', NULL, -1, -1, '2022-09-22 23:15:26', 0, 1, 1, '2022-09-22 20:56:28', '2022-09-22 20:56:28', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (28, 1, NULL, 7, 'fuck u', NULL, -1, -1, '2022-09-25 23:44:45', 0, 1, 1, '2022-09-22 20:58:17', '2022-09-22 20:58:17', 1, 0, NULL);
+INSERT INTO `tb_comment` VALUES (29, 7, NULL, 2, '1111111', NULL, -1, -1, '2022-09-22 23:15:26', 0, 1, 1, '2022-09-22 22:20:34', '2022-09-22 22:20:34', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (30, 2, NULL, 7, '发射点发射点', NULL, -1, -1, '2022-09-28 14:05:27', 0, 1, 1, '2022-09-22 22:20:45', '2022-09-22 22:20:45', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (31, 7, NULL, 2, 'hhh', NULL, -1, -1, '2022-09-22 23:15:26', 0, 1, 1, '2022-09-22 22:21:54', '2022-09-22 22:21:54', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (32, 7, NULL, 2, '11', NULL, -1, -1, '2022-09-22 23:15:26', 0, 1, 1, '2022-09-22 22:26:08', '2022-09-22 22:26:08', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (33, 7, NULL, 2, '11111', NULL, -1, -1, '2022-09-22 23:15:26', 0, 1, 1, '2022-09-22 23:11:27', '2022-09-22 23:11:27', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (34, 7, NULL, 8, 'nihao\n', NULL, -1, -1, NULL, 0, 0, 1, '2022-09-23 15:38:23', '2022-09-23 15:38:23', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (35, 7, NULL, 1, 'ggggg', NULL, -1, -1, '2022-09-25 23:45:49', 0, 1, 1, '2022-09-23 15:38:23', '2022-09-23 15:38:23', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (36, 7, NULL, 1, 'ggggg', NULL, -1, -1, '2022-09-25 23:45:49', 0, 1, 1, '2022-09-23 15:38:25', '2022-09-23 15:38:25', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (37, 7, NULL, 1, 'uuuu', NULL, -1, -1, '2022-09-25 23:45:49', 0, 1, 1, '2022-09-23 15:38:55', '2022-09-23 15:38:55', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (38, 1, NULL, 7, '脚后跟经过', NULL, -1, -1, '2022-09-25 23:44:45', 0, 1, 1, '2022-09-23 15:39:00', '2022-09-23 15:39:00', 1, 0, NULL);
+INSERT INTO `tb_comment` VALUES (39, 7, NULL, 1, '999', NULL, -1, -1, '2022-09-25 23:45:49', 0, 1, 1, '2022-09-23 15:39:16', '2022-09-23 15:39:16', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (40, 7, NULL, 2, '好吧好吧\n', NULL, -1, -1, NULL, 0, 0, 1, '2022-09-26 09:39:27', '2022-09-26 09:39:27', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (41, 7, NULL, 2, 'dsf\nsdf\n', NULL, -1, -1, NULL, 0, 0, 1, '2022-09-26 09:53:51', '2022-09-26 09:53:51', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (42, 7, NULL, 1, '不错', NULL, -1, 41, NULL, 1, 0, 1, '2022-09-26 12:14:28', '2022-09-26 12:14:31', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (43, 8, NULL, 7, '嗯嗯', NULL, 42, 41, '2022-09-28 14:03:40', 1, 1, 1, '2022-09-26 12:48:43', '2022-09-26 12:48:46', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (44, 8, NULL, 1, '还可以', NULL, -1, 41, NULL, 1, 0, 1, '2022-09-26 12:50:33', '2022-09-26 12:50:36', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (45, 10, NULL, 8, '谢谢', NULL, 44, 41, NULL, 1, 0, 1, '2022-09-26 12:51:43', '2022-09-26 12:51:46', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (46, 1, NULL, 10, '嗯嗯嗯', NULL, 45, 41, NULL, 1, 0, 1, '2022-09-26 12:57:06', '2022-09-26 12:57:10', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (47, 9, NULL, 1, '还不错噢', NULL, -1, 41, NULL, 1, 0, 1, '2022-09-26 13:35:41', '2022-09-26 13:35:44', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (48, 10, '', 8, '有道理', NULL, 43, 41, NULL, 1, 0, 1, '2022-09-26 17:26:33', '2022-09-26 17:26:35', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (49, 9, NULL, 8, '我试试', NULL, 43, 41, NULL, 1, 0, 1, '2022-09-27 09:17:40', '2022-09-27 09:17:43', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (50, 7, NULL, 1, '发士大夫', NULL, -1, 41, NULL, 1, 0, 1, '2022-09-27 19:16:41', '2022-09-27 19:16:41', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (51, 7, NULL, 1, '方法', NULL, -1, 41, NULL, 1, 0, 1, '2022-09-27 19:18:04', '2022-09-27 19:18:04', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (52, 7, NULL, 1, '烦烦烦烦烦烦', NULL, -1, 41, NULL, 1, 0, 1, '2022-09-27 19:18:39', '2022-09-27 19:18:39', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (53, 7, NULL, 1, '呱呱呱呱呱呱', NULL, -1, 41, NULL, 1, 0, 1, '2022-09-27 19:20:54', '2022-09-27 19:20:54', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (54, 7, NULL, 1, '哈哈哈哈哈', NULL, -1, 41, NULL, 1, 0, 1, '2022-09-27 19:24:20', '2022-09-27 19:24:20', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (55, 7, NULL, 1, '哈克', NULL, -1, 41, NULL, 1, 0, 1, '2022-09-27 19:33:47', '2022-09-27 19:33:47', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (56, 7, NULL, 1, '烦烦烦方法', NULL, -1, 41, NULL, 1, 0, 1, '2022-09-27 19:34:42', '2022-09-27 19:34:42', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (57, 7, NULL, 1, '怎么了', NULL, 56, 41, NULL, 1, 0, 1, '2022-09-27 22:01:15', '2022-09-27 22:01:15', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (58, 7, NULL, 1, '000000', NULL, -1, 41, NULL, 1, 0, 1, '2022-09-27 22:10:28', '2022-09-27 22:10:28', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (59, 7, NULL, 7, '你好棒', NULL, 58, 41, NULL, 1, 0, 1, '2022-09-27 22:10:40', '2022-09-27 22:10:40', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (60, 7, NULL, 1, '烦烦烦烦烦烦', NULL, -1, 41, NULL, 1, 0, 1, '2022-09-28 00:07:37', '2022-09-28 00:07:37', 1, 1, NULL);
+INSERT INTO `tb_comment` VALUES (61, 7, NULL, 7, '呢嫩嫩\n', NULL, 55, 41, NULL, 1, 0, 1, '2022-09-28 00:10:23', '2022-09-28 00:10:23', 1, 1, NULL);
 
 -- ----------------------------
 -- Records of tb_comment

@@ -73,3 +73,5 @@ alipay:
 esHost: 43.138.135.209
 esPort: 9200
 esScheme: http
+
+# es异常

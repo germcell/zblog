@@ -89,4 +89,11 @@ public interface BlogOutlineMapper {
      * @return
      */
     List<BlogOutline> topNArticlesViewedByUid(@Param("uid") Integer uid, @Param("n") Integer n);
+
+    /**
+     * 按照分类id查询
+     * @param cid
+     * @return
+     */
+    List<BlogOutlineVO> listBlogOutlinesByCid(@Param("cid") int cid);
 }

@@ -1,5 +1,7 @@
 package com.zs.controller;
 
+import com.zs.config.Const2;
+import com.zs.service.BlogOutlineService;
 import com.zs.service.CategoryService;
 import com.zs.service.CopyrightService;
 import com.zs.vo.ResultVO;
@@ -24,11 +26,20 @@ public class CategoryController {
     private CategoryService categoryService;
     @Resource
     private CopyrightService copyrightService;
+    @Resource
+    private BlogOutlineService blogOutlineService;
 
-    @ApiOperation("获取所有文章分类")
+
+    @ApiOperation(value = "获取所有文章分类-已登录状态", tags = "一般在用户发表文章时")
     @ApiImplicitParam(name = "token", value = "用户身份token", paramType = "header", required = true, dataTypeClass = String.class)
     @GetMapping("/listcg")
     public ResultVO listCategory(@RequestHeader String token) {
+        return categoryService.listCategories(null);
+    }
+
+    @ApiOperation("获取文章分类-未登录状态")
+    @GetMapping("/list")
+    public ResultVO pageCategory() {
         return categoryService.listCategories(null);
     }
 
@@ -37,5 +48,15 @@ public class CategoryController {
     @GetMapping("/listcr")
     public ResultVO listCopyright(@RequestHeader String token) {
         return copyrightService.listCopyright(null);
+    }
+
+    @ApiOperation("按分类分页查询文章概要")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "cid", value = "分类id", paramType = "query", required = true, dataTypeClass = Integer.class),
+        @ApiImplicitParam(name = "p", value = "页码", paramType = "query", required = true, dataTypeClass = Integer.class)
+    })
+    @GetMapping("/outline/page")
+    public ResultVO pageBlogOutlineByCid(@RequestParam("cid") int cid, @RequestParam("p") int p) {
+        return blogOutlineService.pageByCid(cid, p);
     }
 }

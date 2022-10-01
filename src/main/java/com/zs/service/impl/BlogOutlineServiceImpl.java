@@ -62,5 +62,12 @@ public class BlogOutlineServiceImpl implements BlogOutlineService {
         }
     }
 
+    @Override
+    public ResultVO pageByCid(int cid, int p) {
+        PageHelper.startPage(p, Const.BLOG_PAGE_ROWS);
+//        PageHelper.startPage(p, 1);
+        return ResultVO.success(new PageInfo<>(blogOutlineMapper.listBlogOutlinesByCid(cid)));
+    }
+
 
 }

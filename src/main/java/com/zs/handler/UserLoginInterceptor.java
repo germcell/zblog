@@ -44,7 +44,7 @@ public class UserLoginInterceptor implements HandlerInterceptor {
         // 获取token
         String token = request.getHeader("token");
         if (token == null) {
-            log.info("操作拦截,未登录");
+            log.info("操作拦截,未登录=>{}", request.getRequestURI());
             doResponse(response, new ResultVO(Const2.NO_LOGIN, "please login", null));
             return false;
         }
@@ -54,7 +54,7 @@ public class UserLoginInterceptor implements HandlerInterceptor {
             log.info("授权token==>{}", token);
             return true;
         } catch (Exception e) {
-            log.info("操作拦截,token错误");
+            log.info("操作拦截,token错误==>{}", request.getRequestURI());
             doResponse(response, new ResultVO(Const2.TOKEN_EXPIRE, "token expire", null));
             return false;
         }

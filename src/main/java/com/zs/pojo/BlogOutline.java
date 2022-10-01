@@ -25,4 +25,5 @@ public class BlogOutline {
   private Boolean isPublish;
   private Integer uid;
   private Date writeTime;
+  private Integer cid;
 }

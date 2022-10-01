@@ -26,6 +26,7 @@
             <result column="first_picture" property="firstPicture"/>
             <result column="write_time" property="writeTime"/>
             <result column="is_publish" property="isPublish"/>
+            <result column="cid" property="cid"/>
         </association>
         <association property="writer" javaType="com.zs.pojo.Writer">
             <result column="writer_name" property="writerName"/>
@@ -50,10 +51,10 @@
 
     <insert id="insert">
         insert into tb_blog_outline
-            (did, title, outline, views, uid, like_num, first_picture, write_time, is_publish)
+            (did, title, outline, views, uid, like_num, first_picture, write_time, is_publish,cid)
         values
             (#{blogOutline.did}, #{blogOutline.title}, #{blogOutline.outline}, #{blogOutline.views}, #{blogOutline.uid},
-             #{blogOutline.likeNum}, #{blogOutline.firstPicture}, #{blogOutline.writeTime}, #{blogOutline.isPublish})
+             #{blogOutline.likeNum}, #{blogOutline.firstPicture}, #{blogOutline.writeTime}, #{blogOutline.isPublish},#{blogOutline.cid})
     </insert>
 
     <select id="listSortByViewsBlogOutline" resultMap="blogOutlineMap">
@@ -86,7 +87,7 @@
     </update>
 
     <select id="listBlogOutlines" resultMap="blogOutlineMapVO">
-        select bo.did,bo.title,bo.outline,bo.views,bo.uid,bo.like_num,bo.first_picture,bo.write_time,bo.is_publish,
+        select bo.did,bo.title,bo.outline,bo.views,bo.uid,bo.like_num,bo.first_picture,bo.write_time,bo.is_publish,bo.cid,
                w.writer_name,w.writer_sex,w.writer_age,w.writer_birthday,w.mail,w.writer_status,w.writer_avatar
         from tb_blog_outline bo inner join tb_writer w on bo.uid = w.uid
         where bo.is_publish = 1 order by bo.write_time desc
@@ -127,5 +128,14 @@
         select did,title,views,uid,is_publish
         from tb_blog_outline
         where is_publish = 1 and uid = #{uid} limit 0,#{n}
+    </select>
+
+    <select id="listBlogOutlinesByCid" resultMap="blogOutlineMapVO">
+        select
+            bo.did,bo.title,bo.outline,bo.views,bo.uid,bo.like_num,bo.first_picture,bo.write_time,bo.is_publish,bo.cid,
+            w.writer_name,w.writer_sex,w.writer_age,w.writer_birthday,w.mail,w.writer_status,w.writer_avatar
+        from tb_blog_outline bo inner join tb_writer w on bo.uid = w.uid
+        where bo.is_publish = 1 and bo.cid = #{cid}
+        order by bo.write_time desc
     </select>
 </mapper>

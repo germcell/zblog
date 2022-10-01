@@ -104,4 +104,9 @@ public class Const2 {
      */
     public static final String MSG_QUEUE_1 = "MsgQueue1";
 
+    /**
+     * 文章分类每页大小
+     */
+    public static final Integer CATEGORY_PAGE_SIZE = 5;
+
 }

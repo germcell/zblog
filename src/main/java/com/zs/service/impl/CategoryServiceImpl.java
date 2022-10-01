@@ -50,8 +50,6 @@ public class CategoryServiceImpl implements CategoryService {
      */
     @Override
     public PageInfo<Category> pageCategory(int currentPage, int rows) {
-        // 计算查询索引
-//        int start = currentPage * rows - rows;
         PageHelper.startPage(currentPage, rows);
         PageInfo<Category> info = new PageInfo<>(categoryMapper.listCategories());
         return info;

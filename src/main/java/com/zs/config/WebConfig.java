@@ -17,11 +17,16 @@ import java.util.List;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    /* 登录拦截器 */
+    /**
+     * 登录拦截器
+     * @param registry
+     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new UserLoginInterceptor())
                 .addPathPatterns("/v2/**")
+//                .addPathPatterns("/v2/msg/commentDel/*")
+//                .addPathPatterns("/v2/msg/comments")
                 .excludePathPatterns("/v2/index/**")
                 .excludePathPatterns("/v2/article/view/**")
                 .excludePathPatterns("/v2/lr/login.do")
@@ -32,8 +37,16 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/v2/thumbs-up/get/*")
                 .excludePathPatterns("/v2/my-alipay/pay")
                 .excludePathPatterns("/v2/my-alipay/pay-notify")
-                .excludePathPatterns("/v2/msg/**")
-                .excludePathPatterns("/swagger-ui/**");
+                .excludePathPatterns("/swagger-ui/**")
+                .excludePathPatterns("/v2/msg/comments/*")
+                .excludePathPatterns("/v2/msg/unread/*")
+                .excludePathPatterns("/v2/msg/newUnread/*")
+                .excludePathPatterns("/v2/msg/del/*")
+                .excludePathPatterns("/v2/msg/private")
+                .excludePathPatterns("/v2/msg/user/*")
+                .excludePathPatterns("/v2/category/*")
+                .excludePathPatterns("/v2/category/outline/page")
+                .excludePathPatterns("/v2/wx/login/*");
     }
 
     /* 实时显示上传后的文件，而不需重启服务器 */

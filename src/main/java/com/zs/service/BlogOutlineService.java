@@ -21,4 +21,12 @@ public interface BlogOutlineService {
      * @return
      */
     ResultVO page(Integer currentPage);
+
+    /**
+     * 分页查询指定分类文章概要
+     * @param cid 分类id
+     * @param p 页码
+     * @return
+     */
+    ResultVO pageByCid(int cid, int p);
 }

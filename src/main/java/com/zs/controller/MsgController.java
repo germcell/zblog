@@ -30,14 +30,6 @@ public class MsgController {
     @Resource
     private MsgService msgService;
 
-    @ApiOperation("发表文章评论")
-    @ApiImplicitParam(name = "msgDTO", value = "消息对象", paramType = "body", required = true, dataTypeClass = MsgDTO.class)
-    @PostMapping("/privateMsg")
-    public ResultVO privateMsg(@RequestBody MsgDTO msgDTO) {
-        // TODO 发表文章评论
-        return null;
-    }
-
     /**
      * 获取指定用户的所有私信用户信息(聊天框左侧私信列表)
      * @return

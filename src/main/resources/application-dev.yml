@@ -72,3 +72,15 @@ alipay:
 esHost: 43.138.135.209
 esPort: 9200
 esScheme: http
+
+# TODO 无微信开发者账号
+wx:
+  open:
+    app_id: wxed9954c01bb89b47
+    app_secret: a7482517235173ddb4083788de60b90e
+#    视频实例地址
+#    redirect_url: http://guli.shop/pi/ucenter/wx/callback
+#    内网穿透地址
+    redirect_url: http://5c38-183-230-207-144.ngrok.io/v2/wx/login/callback
+yygh:
+  baseUrl: http://localhost:3000

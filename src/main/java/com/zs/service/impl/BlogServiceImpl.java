@@ -362,6 +362,7 @@ public class BlogServiceImpl implements BlogService {
         blogOutline.setFirstPicture(blog.getFirstPicture());
         blogOutline.setWriteTime(blog.getWriteTime());
         blogOutline.setIsPublish(blog.getIsPublish());
+        blogOutline.setCid(blog.getCid());
         blogOutlineMapper.insert(blogOutline);
         try {
             // 4.用户文章数累加

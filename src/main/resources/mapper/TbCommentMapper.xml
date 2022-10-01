@@ -83,7 +83,8 @@
     <select id="getUnreadByReceiveId" parameterType="long" resultMap="unreadNumVO">
         select c.send_id,count(*) unread
         from tb_comment c
-        where c.receive_id = #{receiveId} and c.is_read = 0
+        where c.receive_id = #{receiveId} and c.is_read = 0 and msg_tag = 0
+        and c.receive_visible = 1 and c.send_visible = 1
         group by c.send_id
     </select>
 
@@ -102,6 +103,7 @@
         <foreach collection="ids" item="id" open="(" separator=","  close=")">
             #{id}
         </foreach>
+        and msg_tag = 0 and receive_id = #{receiveId}
     </update>
 
     <select id="getCommunication" parameterType="long" resultMap="tbComment">
@@ -111,7 +113,7 @@
     </select>
 
     <select id="getNewUnreadIds" resultMap="unreadNumVO">
-        select id from tb_comment where receive_id = #{receiveId} and send_id = #{sendId}
+        select id from tb_comment where receive_id = #{receiveId} and send_id = #{sendId} and msg_tag = 0
     </select>
 
     <update id="updateBySendIdAndReceiveId">

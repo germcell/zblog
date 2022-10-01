@@ -40,7 +40,7 @@ public class MsgServiceImpl implements MsgService {
         List<TbComment> receive = tbCommentMapper.getByIds(cIds, 0);
 
         // 将私信置为已读
-        tbCommentMapper.updateStatusByIds(cIds, 1);
+        tbCommentMapper.updateStatusByIds(cIds, 1, receive.get(0).getReceiveId());
 
         // 查询回复信息(我)
         long sendId = receive.get(0).getReceiveId();

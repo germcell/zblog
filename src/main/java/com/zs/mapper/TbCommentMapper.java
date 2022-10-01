@@ -43,7 +43,9 @@ public interface TbCommentMapper {
      * @param isRead
      * @return
      */
-    int updateStatusByIds(@Param("ids") List<Long> cIds, @Param("isRead") int isRead);
+    int updateStatusByIds(@Param("ids") List<Long> cIds,
+                          @Param("isRead") int isRead,
+                          @Param("receiveId") long receiveId);
 
     /**
      * 获取回复

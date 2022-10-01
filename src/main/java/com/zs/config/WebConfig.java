@@ -40,7 +40,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/swagger-ui/**")
                 .excludePathPatterns("/v2/msg/comments/*")
                 .excludePathPatterns("/v2/msg/unread/*")
-                .excludePathPatterns("/v2/msg/newUnread/*")
+                .excludePathPatterns("/v2/msg/newUnread/*/*")
                 .excludePathPatterns("/v2/msg/del/*")
                 .excludePathPatterns("/v2/msg/private")
                 .excludePathPatterns("/v2/msg/user/*")

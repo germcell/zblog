@@ -1,5 +1,7 @@
 package com.zs.handler;
 
+import lombok.extern.slf4j.Slf4j;
+
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -8,6 +10,7 @@ import java.util.Properties;
 /**
  * 发邮件工具类
  */
+@Slf4j
 public final class QQMailUtils {
     private static final String USER = "441497343@qq.com"; // 发件人称号，同邮箱地址
     private static final String PASSWORD = "lyexxtzgqmftbiji"; // 如果是qq邮箱可以使户端授权码，或者登录密码
@@ -19,8 +22,8 @@ public final class QQMailUtils {
      * @param title 标题
      */
     /* 发送验证信息的邮件 */
-    public static boolean sendMail(String to, String text, String title){
-        try {
+    public static boolean sendMail(String to, String text, String title) throws MessagingException {
+//        try {
             final Properties props = new Properties();
             props.put("mail.smtp.auth", "true");
             props.put("mail.smtp.host", "smtp.qq.com");
@@ -61,10 +64,11 @@ public final class QQMailUtils {
             // 发送邮件
             Transport.send(message);
             return true;
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return false;
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            log.error("发送邮件异常");
+//            return false;
+//        }
     }
 
     public static void main(String[] args) throws Exception { // 做测试用

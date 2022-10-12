@@ -9,6 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * web配置类
@@ -67,7 +68,7 @@ public class WebConfig implements WebMvcConfigurer {
     /* 定义一个单例的map，用于管理用户注册时生成的验证码,key:邮箱地址 value:验证码 */
     // FIXME 后续可使用redis替换
     @Bean("validateCodeMap")
-    public HashMap<String, String>  validateCodeMap() {
-        return new HashMap<>();
+    public ConcurrentHashMap<String, String> validateCodeMap() {
+        return new ConcurrentHashMap<>();
     };
 }

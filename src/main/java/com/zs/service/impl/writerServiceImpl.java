@@ -4,6 +4,7 @@ import com.zs.config.Const;
 import com.zs.config.Const2;
 import com.zs.handler.QQMailUtils;
 import com.zs.handler.RandomUtils;
+import com.zs.handler.UniversalException;
 import com.zs.handler.UploadUtils;
 import com.zs.mapper.BlogOutlineMapper;
 import com.zs.mapper.WriterMapper;
@@ -15,6 +16,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
@@ -22,6 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @Created by zs on 2022/4/22.
@@ -30,13 +36,18 @@ import java.util.*;
 public class writerServiceImpl implements WriterService {
 
     private Logger logger = LoggerFactory.getLogger(writerServiceImpl.class);
+    private static final String MAIL_TEXT_PREFIX = "你本次的验证码为: ";
+    private static final String MAIL_TITLE = "【ZBLOG】注册验证码，请勿提供给他人";
+
 
     @Resource
-    private HashMap<String, String>  validateCodeMap;
+    private ConcurrentHashMap<String, String> validateCodeMap;
     @Resource
     private WriterMapper writerMapper;
     @Resource
     private BlogOutlineMapper blogOutlineMapper;
+    @Resource(name = "sendMailThreadPool")
+    private ThreadPoolExecutor sendMailThreadPool;
 
     /**
      * 判断用户名\邮箱是否已存在
@@ -90,13 +101,34 @@ public class writerServiceImpl implements WriterService {
         }
         try {
             String validateCode = RandomUtils.generateRandomNum();
-            QQMailUtils.sendMail(mail, "你本次的验证码为: " + validateCode, "【ZBLOG】注册验证码，请勿提供给他人");
-            validateCodeMap.put(mail, validateCode);
-            return new ResultVO(Const2.SEND_MAIL_SUCCESS, "success", validateCodeMap);
+            sendMailThreadPool.submit(new SendMailFutureTask(mail, MAIL_TEXT_PREFIX + validateCode, MAIL_TITLE));
+            return new ResultVO(Const2.SEND_MAIL_SUCCESS, "success", validateCode);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.info("QQ邮箱发送接口异常");
             return new ResultVO(Const2.SEND_MAIL_FAIL, "fail: send mail fail", null);
+        }
+    }
+
+    class SendMailFutureTask implements Callable<Boolean> {
+
+        private String mail;
+        private String text;
+        private String title;
+
+        public SendMailFutureTask(String mail, String text, String title) {
+            this.mail = mail;
+            this.text = text;
+            this.title = title;
+        }
+
+        @Override
+        public Boolean call() throws Exception {
+            boolean b = QQMailUtils.sendMail(mail, text, title);
+            if (b) {
+                logger.info("发送邮件验证码==>{},{}", mail, text);
+                return true;
+            }
+            logger.error("注册邮件发送失败==>{}", mail);
+            throw new UniversalException("注册邮件发送失败");
         }
     }
 

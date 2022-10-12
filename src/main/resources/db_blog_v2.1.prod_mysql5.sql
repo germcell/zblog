@@ -82,33 +82,37 @@ INSERT INTO `tb_blog` VALUES (73, 'MyBatis配合PageHepler实现分页', '###分
 -- ----------------------------
 -- Table structure for tb_blog_outline
 -- ----------------------------
+-- ----------------------------
+-- Table structure for tb_blog_outline
+-- ----------------------------
 DROP TABLE IF EXISTS `tb_blog_outline`;
 CREATE TABLE `tb_blog_outline`  (
-  `did` int(0) NOT NULL AUTO_INCREMENT COMMENT '于blog表bid保持一致',
-  `title` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '博客标题',
-  `outline` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '博客的概要',
-  `views` int(0) NOT NULL COMMENT '博客浏览数',
-  `uid` int(0) NOT NULL COMMENT '用户id',
-  `like_num` int(0) NULL DEFAULT 0 COMMENT '点赞量',
-  `first_picture` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '文章封面图',
-  `write_time` timestamp(0) DEFAULT CURRENT_TIMESTAMP COMMENT '文章发布时间',
-  `is_publish` tinyint(0) NULL DEFAULT NULL COMMENT '文章状态，同blog表一致',
-  PRIMARY KEY (`did`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 74 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
+    `did` int(0) NOT NULL AUTO_INCREMENT COMMENT '于blog表bid保持一致',
+    `title` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '博客标题',
+    `outline` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '博客的概要',
+    `views` int(0) NOT NULL COMMENT '博客浏览数',
+    `uid` int(0) NOT NULL COMMENT '用户id',
+    `like_num` int(0) NULL DEFAULT 0 COMMENT '点赞量',
+    `first_picture` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '文章封面图',
+    `write_time` timestamp(0) NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '文章发布时间',
+    `is_publish` tinyint(0) NULL DEFAULT NULL COMMENT '文章状态，同blog表一致',
+    `cid` int(0) NOT NULL COMMENT '所属分类',
+    PRIMARY KEY (`did`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 82 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of tb_blog_outline
 -- ----------------------------
-INSERT INTO `tb_blog_outline` VALUES (41, 'tomcat修改端口、部署项目', '修改默认端口进入tomcat解压文件夹中依次进入confserver.xml找到里面的connector标签部署工程1.将工程文件夹复制到tomcat安装目录中的webapps文件夹中2.在', 12, 1, 234, '23432423324.jpg', '2022-06-25 19:28:20', 1);
-INSERT INTO `tb_blog_outline` VALUES (44, 'Stream流', 'stream流1.概念及作用将数组或集合的元素全部取出放在类似一条传送带上我们可以在上面操作元素主要作用是为了简化传统数组集合的复杂的操作将操作简单化2.获取stream流', 11, 1, 9, '23432423324.jpg', '2022-06-25 17:47:23', 1);
-INSERT INTO `tb_blog_outline` VALUES (45, 'MyBatis配合PageHepler实现分页', '分页插件使用1.引入pagehelper依赖xmldtd!分页插件dependencygroupdcom.github.pagehelper/group', 36, 1, 0, '23432423324.jpg', '2022-04-21 17:18:42', 1);
-INSERT INTO `tb_blog_outline` VALUES (54, 'thymeleaf局部刷新表格后，js绑定事件失效', '传统绑定事件方式jquery$.mcommentpass.onclick,function局部刷新后会发现单击事件失效因为局部刷新table表格后识别不到元素js事件不会触发', 54, 1, 1, '23432423324.jpg', '2022-05-20 17:29:01', 1);
-INSERT INTO `tb_blog_outline` VALUES (57, 'springboot+editormd上传图片功能', '1引言使用editormd+springboot实现md编辑器的图片上传功能2editormd部分**通过js开启上传图片功能**imageormats指定可接收的图片格式我只列举了我工程所用到的im', 69, 1, 0, '23432423324.jpg', '2022-05-20 17:29:01', 1);
-INSERT INTO `tb_blog_outline` VALUES (63, 'git pull错误：error: Your local changes to the following files would be overwritten by merge', '1.问题项目存在多个分支今天将某个分支的最新代码合并到master分支然后pull报错2解决shellgitstashgitpulloriginmastergitstashpop因为当前ma', 14, 1, 0, '23432423324.jpg', '2022-05-20 17:29:01', 1);
-INSERT INTO `tb_blog_outline` VALUES (66, '测试1122222222', '测试测试车111111111', 10923, 7, 213, '34171651286274673.png', '2022-05-20 17:29:01', 1);
-INSERT INTO `tb_blog_outline` VALUES (71, 'MyBatis配合PageHepler实现分页操作', '分页插件使用1.引入pagehelper依赖xmldtd!分页插件dependencygroupdcom.github.pagehelper/group', 3234, 1, 378, NULL, '2022-05-20 17:29:01', 1);
-INSERT INTO `tb_blog_outline` VALUES (72, 'MyBatis配合PageHepler实现分页', '分页插件使用1.引入pagehelper依赖xmldtd!分页插件dependencygroupdcom.github.pagehelper/group', 0, 1, 0, NULL, '2022-04-29 21:29:51', 1);
-INSERT INTO `tb_blog_outline` VALUES (73, 'MyBatis配合PageHepler实现分页', '分页插件使用1.引入pagehelper依赖xmldtd!分页插件dependencygroupdcom.github.pagehelper/group', 0, 1, 0, NULL, '2022-04-29 21:35:04', 1);
+INSERT INTO `tb_blog_outline` VALUES (41, 'tomcat修改端口、部署项目', '修改默认端口进入tomcat解压文件夹中依次进入confserver.xml找到里面的connector标签部署工程1.将工程文件夹复制到tomcat安装目录中的webapps文件夹中2.在', 12, 1, 236, '23432423324.jpg', '2022-10-01 12:00:00', 1, 1);
+INSERT INTO `tb_blog_outline` VALUES (44, 'Stream流', 'stream流1.概念及作用将数组或集合的元素全部取出放在类似一条传送带上我们可以在上面操作元素主要作用是为了简化传统数组集合的复杂的操作将操作简单化2.获取stream流', 11, 1, 9, '23432423324.jpg', '2022-09-29 22:49:31', 1, 1);
+INSERT INTO `tb_blog_outline` VALUES (45, 'MyBatis配合PageHepler实现分页', '分页插件使用1.引入pagehelper依赖xmldtd!分页插件dependencygroupdcom.github.pagehelper/group', 36, 1, 0, '23432423324.jpg', '2022-09-29 22:49:34', 1, 27);
+INSERT INTO `tb_blog_outline` VALUES (54, 'thymeleaf局部刷新表格后，js绑定事件失效', '传统绑定事件方式jquery$.mcommentpass.onclick,function局部刷新后会发现单击事件失效因为局部刷新table表格后识别不到元素js事件不会触发', 54, 1, 1, '23432423324.jpg', '2022-09-29 22:49:37', 1, 33);
+INSERT INTO `tb_blog_outline` VALUES (57, 'springboot+editormd上传图片功能', '1引言使用editormd+springboot实现md编辑器的图片上传功能2editormd部分**通过js开启上传图片功能**imageormats指定可接收的图片格式我只列举了我工程所用到的im', 69, 1, 0, '23432423324.jpg', '2022-09-29 22:49:40', 1, 32);
+INSERT INTO `tb_blog_outline` VALUES (63, 'git pull错误：error: Your local changes to the following files would be overwritten by merge', '1.问题项目存在多个分支今天将某个分支的最新代码合并到master分支然后pull报错2解决shellgitstashgitpulloriginmastergitstashpop因为当前ma', 14, 1, 0, '23432423324.jpg', '2022-09-29 22:49:46', 1, 35);
+INSERT INTO `tb_blog_outline` VALUES (66, '测试1122222222', '测试测试车111111111', 10923, 7, 213, '34171651286274673.png', '2022-09-29 22:49:50', 1, 34);
+INSERT INTO `tb_blog_outline` VALUES (71, 'MyBatis配合PageHepler实现分页操作', '分页插件使用1.引入pagehelper依赖xmldtd!分页插件dependencygroupdcom.github.pagehelper/group', 3234, 1, 378, NULL, '2022-09-29 22:49:52', 1, 27);
+INSERT INTO `tb_blog_outline` VALUES (72, 'MyBatis配合PageHepler实现分页', '分页插件使用1.引入pagehelper依赖xmldtd!分页插件dependencygroupdcom.github.pagehelper/group', 0, 1, 0, NULL, '2022-09-29 22:49:55', 1, 32);
+INSERT INTO `tb_blog_outline` VALUES (73, 'MyBatis配合PageHepler实现分页', '分页插件使用1.引入pagehelper依赖xmldtd!分页插件dependencygroupdcom.github.pagehelper/group', 0, 1, 0, NULL, '2022-09-29 22:50:00', 1, 27);
 
 -- ----------------------------
 -- Table structure for tb_category

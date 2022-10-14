@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 
 /**
  * 用户登录拦截器，基于请求头token验证
@@ -54,7 +55,16 @@ public class UserLoginInterceptor implements HandlerInterceptor {
             log.info("授权token==>{}", token);
             return true;
         } catch (Exception e) {
-            log.info("操作拦截,token错误==>{}", request.getRequestURI());
+
+            Claims claims = Jwts.parser()
+                    .setSigningKey(Const2.TOKEN_PWD)
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            String expirationTime = DateUtils.dateToString(claims.getExpiration(), "yyyy-MM-dd HH:mm:ss");
+
+            log.warn("操作拦截==>{},token错误或过期==>{}", request.getRequestURI(), expirationTime);
+            e.printStackTrace();
             doResponse(response, new ResultVO(Const2.TOKEN_EXPIRE, "token expire", null));
             return false;
         }

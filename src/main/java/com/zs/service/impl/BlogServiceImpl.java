@@ -1,5 +1,6 @@
 package com.zs.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zs.config.Const;
@@ -12,6 +13,11 @@ import com.zs.service.BlogService;
 import com.zs.service.IndexService;
 import com.zs.vo.*;
 import org.aspectj.weaver.ast.Var;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +32,8 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @Created by zs on 2022/3/3.
@@ -56,7 +64,11 @@ public class BlogServiceImpl implements BlogService {
     @Resource
     private ElasticSearchUtils elasticSearchUtils;
     @Resource
+    private RestHighLevelClient restHighLevelClient;
+    @Resource
     private IndexService indexService;
+    @Resource(name = "handleEsDataThreadPool")
+    private ThreadPoolExecutor handleEsDataThreadPool;
 
     @Override
     public PageInfo<Blog> listPageBlogs(Integer currentPage, Integer rows) {
@@ -364,6 +376,13 @@ public class BlogServiceImpl implements BlogService {
         blogOutline.setIsPublish(blog.getIsPublish());
         blogOutline.setCid(blog.getCid());
         blogOutlineMapper.insert(blogOutline);
+        // 将新添文章添加到ES中
+        try {
+            handleEsDataThreadPool.submit(new ImportArticleToEsTask(blogOutline, restHighLevelClient));
+        } catch (Exception e) {
+            logger.error("新增文章导入到ES异常,文章id==>{}", blogOutline.getDid());
+            throw new UniversalException("新增文章导入到ES异常" + blogOutline.getDid());
+        }
         try {
             // 4.用户文章数累加
             if (blog.getIsPublish()) {
@@ -380,6 +399,25 @@ public class BlogServiceImpl implements BlogService {
             e.printStackTrace();
             logger.info("发布文章接口异常");
             return new ResultVO(Const.EDIT_BLOG_FAILED, "fail", null);
+        }
+    }
+
+    private static class ImportArticleToEsTask implements Callable<Boolean> {
+        private BlogOutline blogOutline;
+        private RestHighLevelClient restHighLevelClient;
+
+        public ImportArticleToEsTask(BlogOutline blogOutline, RestHighLevelClient restHighLevelClient) {
+            this.blogOutline = blogOutline;
+            this.restHighLevelClient = restHighLevelClient;
+        }
+
+        @Override
+        public Boolean call() throws Exception {
+            IndexRequest indexRequest = new IndexRequest(Const2.ES_ARTICLE_INDEX);
+            indexRequest.id(String.valueOf(blogOutline.getDid()));
+            indexRequest.source(JSON.toJSON(blogOutline), XContentType.JSON);
+            IndexResponse index = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
+            return true;
         }
     }
 

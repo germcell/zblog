@@ -12,6 +12,7 @@ import com.zs.pojo.BlogOutline;
 import com.zs.pojo.Writer;
 import com.zs.service.WriterService;
 import com.zs.vo.ResultVO;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
@@ -23,11 +24,14 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @Created by zs on 2022/4/22.
@@ -200,14 +204,17 @@ public class writerServiceImpl implements WriterService {
               return new ResultVO(Const2.LOGIN_FAIL, "fail: username or pwd mismatch", writer);
             }
             if (Objects.equals(writers.get(0).getPwd(), DigestUtils.md5DigestAsHex(writer.getPwd().getBytes()))) {
-                // 生成token
+
+                // 生成token，20天有效期
                 String token = Jwts.builder()
                         .setIssuedAt(new Date())
                         .setId(writers.get(0).getUid() + "")
-                        .setExpiration(new Date(System.currentTimeMillis() + 3 * 24 * 60 * 60 * 1000))
+//                        .setExpiration(new Date(System.currentTimeMillis() + 3 * 24 * 60 * 60 * 1000))
+                        .setExpiration(new Date(System.currentTimeMillis() + 20 * 24 * 60 * 60 * 1000))
                         .signWith(SignatureAlgorithm.HS256, Const2.TOKEN_PWD)
                         .compact();
                 writers.get(0).setPwd(token);
+
                 return new ResultVO(Const2.LOGIN_SUCCESS, "success", writers.get(0));
             }
             return new ResultVO(Const2.LOGIN_FAIL, "fail: username or pwd mismatch", writer);

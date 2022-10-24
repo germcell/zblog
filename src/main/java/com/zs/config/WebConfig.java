@@ -47,7 +47,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/v2/msg/user/*")
                 .excludePathPatterns("/v2/category/*")
                 .excludePathPatterns("/v2/category/outline/page")
-                .excludePathPatterns("/v2/wx/login/*");
+                .excludePathPatterns("/v2/wx/login/*")
+                .excludePathPatterns("/v2/lr/isLogin");
     }
 
     /* 实时显示上传后的文件，而不需重启服务器 */

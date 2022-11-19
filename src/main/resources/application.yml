@@ -1,5 +1,5 @@
 spring:
   profiles:
-    active: dev
+    active: prod
 
 # 接口文档 ip:port/doc.html
